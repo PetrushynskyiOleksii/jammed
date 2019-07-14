@@ -55,5 +55,20 @@ class MongoWorker:
 
         return [str(document_id) for document_id in documents_ids]
 
+    def update(self, query_filter, modifications, collection):
+        """Update a single document matching the filter."""
+        collection = self.__collections.get(collection)
+
+        try:
+            is_updated = collection.update_one(
+                filter=query_filter,
+                update=modifications,
+            ).modified_count
+        except (PyMongoError, AttributeError, ValueError, TypeError):
+            # TODO: add logger
+            return False
+
+        return bool(is_updated)
+
 
 MONGER = MongoWorker()
