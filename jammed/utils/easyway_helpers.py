@@ -13,7 +13,7 @@ def compile_gtfs(gtfs):
     for entity in feed.entity:
         vehicle = entity.vehicle
         position = vehicle.position
-        route_id = vehicle.trip.route_id
+        route_id = int(vehicle.trip.route_id)
 
         if not gtfs_dict.get(route_id):
             gtfs_dict[route_id] = []
