@@ -36,7 +36,7 @@ class MongoWorker:
             except PyMongoError:
                 return None
 
-            cls.__database = cls.__client.ifilm_db
+            cls.__database = cls.__client.jammed
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
             }
