@@ -1,5 +1,7 @@
 """This module provides helper functionality for MongoDB interaction."""
 
+import logging
+
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
@@ -11,6 +13,7 @@ __all__ = ['MONGER']
 MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
 MONGO_SERVER_TIMEOUT = 5 * 1000
+LOGGER = logging.getLogger('JAMMED')
 
 
 class MongoWorker:
@@ -34,6 +37,7 @@ class MongoWorker:
             try:
                 cls.__client.admin.command('ismaster')
             except PyMongoError:
+                LOGGER.critical('Could not connect to MONGO.')
                 return None
 
             cls.__database = cls.__client.jammed
@@ -49,8 +53,8 @@ class MongoWorker:
 
         try:
             documents_ids = collection.insert_many(documents).inserted_ids
-        except (PyMongoError, AttributeError):
-            # TODO: add logger
+        except (PyMongoError, AttributeError) as err:
+            LOGGER.error(f'Could not insert many documents: {err}')
             return []
 
         return [str(document_id) for document_id in documents_ids]
@@ -64,8 +68,8 @@ class MongoWorker:
                 filter=query_filter,
                 update=modifications,
             ).modified_count
-        except (PyMongoError, AttributeError, ValueError, TypeError):
-            # TODO: add logger
+        except (PyMongoError, AttributeError, ValueError, TypeError) as err:
+            LOGGER.error(f'Could not update document: {err}')
             return False
 
         return bool(is_updated)

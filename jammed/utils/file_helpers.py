@@ -6,7 +6,11 @@ import requests
 
 def download_file(url):
     """Download file from `url` to directory with path `save_to`."""
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except requests.exceptions.RequestException:
+        return None
+
     if not response.status_code == 200:
         return None
 
