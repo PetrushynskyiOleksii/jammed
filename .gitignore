@@ -114,6 +114,3 @@ venv.bak/
 node_modules/
 package-lock.json
 bundle.js
-
-# Logging stuff
-logs/

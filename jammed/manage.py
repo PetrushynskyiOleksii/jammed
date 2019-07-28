@@ -13,7 +13,7 @@ LOGGER = logging.getLogger('JAMMED')
 LOGGER.setLevel(logging.DEBUG)
 
 c_handler = logging.StreamHandler()
-f_handler = logging.FileHandler(f'{BASE_DIR}/logs/jammed.log')
+f_handler = logging.FileHandler(f'{BASE_DIR}/var/logs/jammed.log')
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 c_handler.setFormatter(formatter)
