@@ -2,15 +2,20 @@
 
 import os
 import time
+import json
 import logging
+import datetime
 
 from mongo.worker import MONGER
 from utils.file_helpers import download_file
 from utils.easyway_helpers import compile_gtfs
-from utils.constants import ROUTES_COLLECTION, VEHICLE_URL
+from utils.constants import ROUTES_COLLECTION, VEHICLE_URL, COLLECTED_DIR
 
 
+TIMEOUT = datetime.time(23, 45)
 MAX_COLLECTION_TRIES = 10
+
+
 LOGGER = logging.getLogger('JAMMED')
 
 
@@ -24,6 +29,50 @@ class GTFSCollector:
         self.is_processed = False
         self.pid = None
         self.attempts = 1
+
+    @property
+    def is_timeout(self):
+        """Return True if it time to dump data and pause collector."""
+        now = datetime.datetime.now().time()
+        return now >= TIMEOUT
+
+    @property
+    def time_until_morning(self):
+        """Return time to 6 a.m."""
+        now = datetime.datetime.now()
+        morning = now.replace(
+            day=now.day + 1,
+            hour=5,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+        return (morning - now).seconds
+
+    def dump_data(self):
+        """Dump collection data from database to file."""
+        documents = MONGER.find(
+            collection=ROUTES_COLLECTION,
+            fields={'_id': 0})
+        if not documents:
+            LOGGER.warning(f'Could not find any document in collection {ROUTES_COLLECTION}')
+            return
+
+        nflushed = MONGER.flush_collection(collection=ROUTES_COLLECTION)
+        if nflushed:
+            LOGGER.info(f'Successfully flushed {nflushed} documents '
+                        f'in collection {ROUTES_COLLECTION}')
+
+        date = datetime.datetime.now()
+        filename = date.strftime('%Y%m%d')
+        with open(f'{COLLECTED_DIR}/{filename}.json', 'w+') as f:
+            try:
+                json.dump(documents, f)
+            except (TypeError, AttributeError) as err:
+                LOGGER.error(f'Could not deserialize documents: {err}')
+                return
+
+        LOGGER.info(f'Successfully dumped documents to {filename}')
 
     def start(self):
         """Executes before Daemon instance starts to process user-defined commands."""
@@ -40,6 +89,10 @@ class GTFSCollector:
         """Implements permanent repetition for the execution of certain commands."""
         self.start()
         while self.is_processed:
+            if self.is_timeout:
+                self.dump_data()
+                time.sleep(self.time_until_morning)
+
             executed = self.execute()
             if executed:
                 self.attempts = 1
