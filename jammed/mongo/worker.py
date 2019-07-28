@@ -2,6 +2,7 @@
 
 import logging
 
+from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
@@ -73,6 +74,36 @@ class MongoWorker:
             return False
 
         return bool(is_updated)
+
+    def find(self, collection, query_filter={}, order_by=None, fields=None, limit=0):
+        """
+        Retrieve the documents from a certain collection by filter."""
+        collection = self.__collections.get(collection)
+
+        try:
+            documents = collection.find(
+                filter=query_filter,
+                sort=order_by,
+                projection=fields,
+                limit=limit,
+            )
+        except (PyMongoError, InvalidId, AttributeError, TypeError) as err:
+            LOGGER.error(f'Could not read data from collection {collection}'
+                         f' by filer {query_filter}: {err}')
+            return None
+
+        return [document for document in documents]
+
+    def flush_collection(self, collection):
+        """Remove all documents in certain collection."""
+        collection = self.__collections.get(collection)
+        try:
+            nflushed = collection.remove({})
+        except PyMongoError as err:
+            LOGGER.error(f'Could not flush collection {collection}: {err}')
+            return 0
+
+        return nflushed
 
 
 MONGER = MongoWorker()
