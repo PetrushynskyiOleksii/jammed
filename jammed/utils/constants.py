@@ -14,4 +14,5 @@ VEHICLE_URL = 'http://track.ua-gis.com/gtfs/lviv/vehicle_position'
 
 # Mongo stuff
 ROUTES_COLLECTION = 'routes'
-ROUTES_GRAPHS_COLLECTION = 'routes_graphs'
+DYNAMIC_GRAPHS_COLLECTION = 'dynamic_graphs'
+STATIC_GRAPHS_COLLECTION = 'static_graphs'

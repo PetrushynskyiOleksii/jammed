@@ -9,7 +9,7 @@ import datetime
 from mongo.worker import MONGER
 from utils.file_helpers import download_file
 from utils.easyway_helpers import compile_gtfs, parse_routes
-from utils.constants import ROUTES_COLLECTION, ROUTES_GRAPHS_COLLECTION, VEHICLE_URL, COLLECTED_DIR
+from utils.constants import ROUTES_COLLECTION, DYNAMIC_GRAPHS_COLLECTION, VEHICLE_URL, COLLECTED_DIR
 
 
 TIMEOUT = datetime.time(23, 45)
@@ -146,6 +146,6 @@ class GTFSCollector:
             total_routes += 1
             total_trips += trips_count
 
-        MONGER.insert_many(graphs_data, ROUTES_GRAPHS_COLLECTION)
+        MONGER.insert_many(graphs_data, DYNAMIC_GRAPHS_COLLECTION)
         LOGGER.info(f'Successfully pushed {total_trips} trips to {total_routes} routes.')
         return True

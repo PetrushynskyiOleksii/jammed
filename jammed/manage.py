@@ -1,12 +1,13 @@
 """This module provides project management."""
 
 import sys
+import time
 import logging
 
 from mongo.worker import MONGER
 from collector.gtfs import GTFSCollector
-from utils.constants import ROUTES_COLLECTION, BASE_DIR
-from utils.easyway_helpers import parse_routes
+from utils.constants import ROUTES_COLLECTION, STATIC_GRAPHS_COLLECTION, BASE_DIR
+from utils.easyway_helpers import parse_routes, parse_graph_data
 
 
 LOGGER = logging.getLogger('JAMMED')
@@ -23,16 +24,28 @@ LOGGER.addHandler(c_handler)
 LOGGER.addHandler(f_handler)
 
 
-def load_routes():
+def populate_db():
     """
-    Load csv file with static data about routes in Lviv,
-    and insert formatted documents to `routes` mongo collection.
+    1.  Load csv file with static data about routes in Lviv,
+        and insert formatted documents to `routes` mongo collection.
+    2.  Calculate count transports per agency, transport type and
+        certain route from the static EasyWay data and insert it
+        to `static_graphs` mongo collection.
     """
     routes = parse_routes()
     inserted_cnt = MONGER.insert_many(routes, ROUTES_COLLECTION)
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} routes.')
 
-    return inserted_cnt
+    graphs_docs = []
+    count_graphs_data = parse_graph_data()
+    for graph_id, graph_data in count_graphs_data.items():
+        graphs_docs.append({
+            'id': graph_id,
+            'data': graph_data,
+            'timestamp': time.time()
+        })
+    inserted_cnt = MONGER.insert_many(graphs_docs, STATIC_GRAPHS_COLLECTION)
+    LOGGER.info(f'Successfully inserted {len(inserted_cnt)} data items for graphs.')
 
 
 def run_collector():
@@ -48,7 +61,7 @@ def run_collector():
 
 if __name__ == '__main__':
     commands = {
-        'load_routes': load_routes,
+        'populate': populate_db,
         'collect': run_collector,
     }
 

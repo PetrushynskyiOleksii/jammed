@@ -6,7 +6,7 @@ from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from utils.constants import ROUTES_COLLECTION, ROUTES_GRAPHS_COLLECTION
+from utils.constants import ROUTES_COLLECTION, DYNAMIC_GRAPHS_COLLECTION, STATIC_GRAPHS_COLLECTION
 
 
 __all__ = ['MONGER']
@@ -44,7 +44,8 @@ class MongoWorker:
             cls.__database = cls.__client.jammed
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
-                ROUTES_GRAPHS_COLLECTION: cls.__database.routes_graphs
+                DYNAMIC_GRAPHS_COLLECTION: cls.__database.dynamic_graphs,
+                STATIC_GRAPHS_COLLECTION: cls.__database.static_graphs
             }
 
         return cls.__instance
