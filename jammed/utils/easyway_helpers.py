@@ -1,7 +1,12 @@
 """This module provides functionality to work with data from EasyWay."""
 
+import re
+
 from google import protobuf
 from google.transit import gtfs_realtime_pb2
+
+from utils.file_helpers import load_csv
+from utils.constants import EASYWAY_STATIC_DIR
 
 
 def compile_gtfs(gtfs):
@@ -32,3 +37,24 @@ def compile_gtfs(gtfs):
         })
 
     return gtfs_dict
+
+
+def parse_routes():
+    """Load csv file with static data about routes in Lviv."""
+    agency_csv = load_csv(f'{EASYWAY_STATIC_DIR}/agency.txt')
+    agencies = {agency['agency_id']: agency['agency_name'] for agency in agency_csv}
+
+    routes_csv = load_csv(f'{EASYWAY_STATIC_DIR}/routes.txt')
+    routes = []
+    for route in routes_csv:
+        routes.append({
+            'id': int(route['route_id']),
+            'transport_type': re.sub(r'\d+', '', route['route_short_name']),
+            'short_name': route['route_short_name'],
+            'long_name': route['route_long_name'],
+            'agency_id': route['agency_id'],
+            'agency_name': agencies[route['agency_id']],
+            'trips': [],
+        })
+
+    return routes

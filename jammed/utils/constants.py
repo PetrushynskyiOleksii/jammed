@@ -3,9 +3,15 @@
 import os
 
 
+# Project stuff
 BASE_DIR = os.path.abspath('..')
 PROJECT_DIR = os.path.abspath('.')
 COLLECTED_DIR = f'{BASE_DIR}/var/collected'
+
+# EasyWay stuff
 EASYWAY_STATIC_DIR = f'{PROJECT_DIR}/static/ew'
-ROUTES_COLLECTION = 'routes'
 VEHICLE_URL = 'http://track.ua-gis.com/gtfs/lviv/vehicle_position'
+
+# Mongo stuff
+ROUTES_COLLECTION = 'routes'
+ROUTES_GRAPHS_COLLECTION = 'routes_graphs'

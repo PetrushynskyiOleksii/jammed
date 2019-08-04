@@ -8,8 +8,8 @@ import datetime
 
 from mongo.worker import MONGER
 from utils.file_helpers import download_file
-from utils.easyway_helpers import compile_gtfs
-from utils.constants import ROUTES_COLLECTION, VEHICLE_URL, COLLECTED_DIR
+from utils.easyway_helpers import compile_gtfs, parse_routes
+from utils.constants import ROUTES_COLLECTION, ROUTES_GRAPHS_COLLECTION, VEHICLE_URL, COLLECTED_DIR
 
 
 TIMEOUT = datetime.time(23, 45)
@@ -29,6 +29,7 @@ class GTFSCollector:
         self.is_processed = False
         self.pid = None
         self.attempts = 1
+        self.static_routes = {x['id']: x['transport_type'] for x in parse_routes()}
 
     @property
     def is_timeout(self):
@@ -93,7 +94,7 @@ class GTFSCollector:
                 self.dump_data()
                 time.sleep(self.time_until_morning)
 
-            executed = self.execute()
+            executed = self.collect()
             if executed:
                 self.attempts = 1
                 time.sleep(self.frequency)
@@ -105,7 +106,7 @@ class GTFSCollector:
                 self.attempts += 1
                 LOGGER.warning(f'Could not execute collecting. Attempt #{self.attempts}')
 
-    def execute(self):
+    def collect(self):
         """
         Defines commands to download data about Lviv transport geolocation,
         compile it to the dictionary format and insert it to the database.
@@ -120,19 +121,31 @@ class GTFSCollector:
             LOGGER.error('Failed to compile GTFS data to json format.')
             return False
 
+        graphs_data = []
         total_routes = total_trips = 0
         for route_id, trips in gtfs_dict.items():
-            is_updated = MONGER.update(
+            MONGER.update(
                 query_filter={'id': route_id},
                 modifications={'$push': {'trips': {'$each': trips}}},
                 collection=ROUTES_COLLECTION
             )
-            if not is_updated:
-                LOGGER.error(f'Failed to update trips for route - {route_id}')
-                continue
+
+            trips_count = len(trips)
+            route_speeds = [trip['speed'] for trip in trips if trip['speed'] > 0]
+            route_avg_speed = sum(route_speeds) / trips_count
+            route_coordinates = [(trip['latitude'], trip['longitude']) for trip in trips]
+            graphs_data.append({
+                'route_id': route_id,
+                'route_type': self.static_routes.get(route_id),
+                'avg_speed': route_avg_speed,
+                'trips_count': trips_count,
+                'coordinates': route_coordinates,
+                'timestamp': time.time()
+            })
 
             total_routes += 1
-            total_trips += len(trips)
+            total_trips += trips_count
 
+        MONGER.insert_many(graphs_data, ROUTES_GRAPHS_COLLECTION)
         LOGGER.info(f'Successfully pushed {total_trips} trips to {total_routes} routes.')
         return True

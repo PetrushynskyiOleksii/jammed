@@ -6,7 +6,7 @@ from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from utils.constants import ROUTES_COLLECTION
+from utils.constants import ROUTES_COLLECTION, ROUTES_GRAPHS_COLLECTION
 
 
 __all__ = ['MONGER']
@@ -44,6 +44,7 @@ class MongoWorker:
             cls.__database = cls.__client.jammed
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
+                ROUTES_GRAPHS_COLLECTION: cls.__database.routes_graphs
             }
 
         return cls.__instance
@@ -70,7 +71,8 @@ class MongoWorker:
                 update=modifications,
             ).modified_count
         except (PyMongoError, AttributeError, ValueError, TypeError) as err:
-            LOGGER.error(f'Could not update document: {err}')
+            LOGGER.error(f'Could not update document in `{collection}`: {err}. '
+                         f'The following query was used: {query_filter}')
             return False
 
         return bool(is_updated)
