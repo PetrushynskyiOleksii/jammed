@@ -106,20 +106,20 @@ def parse_stops_per_regions():
 
 def parse_stops_per_routes():
     """Return dict with data about number of stops per routes."""
-    routes_data = parse_trips()
+    trips_map = {}
+    routes = parse_trips()
+    for route, trips in parse_trips().items():
+        trips_map.update({trip: route for trip in trips})
 
     stops = set()
     stop_times = load_csv(f'{EASYWAY_STATIC_DIR}/stop_times.txt')
     for stop_time in stop_times:
         trip_id = stop_time['trip_id'].split('_')[0]
         stop_id = stop_time['stop_id']
+        route_id = trips_map[trip_id]
+        stops.add((route_id, stop_id))
 
-        for route, trips in routes_data.items():
-            if trip_id in trips:
-                stops.add((route, stop_id))
-                continue
-
-    routes = dict.fromkeys(routes_data.keys(), 0)
+    routes = dict.fromkeys(routes.keys(), 0)
     for route_id, stop_id in stops:
         routes[route_id] += 1
 
