@@ -24,13 +24,14 @@ LOGGER.addHandler(c_handler)
 LOGGER.addHandler(f_handler)
 
 
-def populate_db():
+def populate_db(args):
     """
     1.  Load csv file with static data about routes in Lviv,
         and insert formatted documents to `routes` mongo collection.
     2.  Calculate count transports per agency, transport type and
-        certain route from the static EasyWay data and insert it
-        to `static_graphs` mongo collection.
+        certain route, count transport stops per regions, routes
+        from the static EasyWay data and insert it to `static_graphs`
+        mongo collection.
     """
     routes = parse_routes()
     inserted_cnt = MONGER.insert_many(routes, ROUTES_COLLECTION)
@@ -48,9 +49,9 @@ def populate_db():
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} data items for graphs.')
 
 
-def run_collector():
+def run_collector(args):
     try:
-        frequency = int(sys.argv[2])
+        frequency = int(args[2])
     except (IndexError, ValueError):
         LOGGER.error('Invalid frequency. Please provide integer number as frequency.')
         return
@@ -59,17 +60,24 @@ def run_collector():
     collector.run()
 
 
+def runserver(args):
+    """Create Flask server and run it."""
+    from api.app import create_app
+    app = create_app()
+    app.run(debug=False)
+
+
 if __name__ == '__main__':
     commands = {
         'populate': populate_db,
         'collect': run_collector,
+        'runserver': runserver,
     }
 
-    if len(sys.argv) > 1:
-        arg = sys.argv[1]
-        command = commands.get(arg)
-        if command:
-            command()
-        else:
-            LOGGER.error(f"No such command. "
-                         f"Please provide one of existing command: {', '.join(commands.keys())}")
+    try:
+        command = sys.argv[1]
+        command = commands[command]
+        command(sys.argv)
+    except (IndexError, KeyError):
+        LOGGER.error(f"No such command. "
+                     f"Please provide one of existing command: {', '.join(commands.keys())}")
