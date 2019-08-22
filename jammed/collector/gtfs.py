@@ -112,7 +112,7 @@ class GTFSCollector:
         compile it to the dictionary format and insert it to the database.
         """
         gtfs_content = download_file(VEHICLE_URL)
-        if not VEHICLE_URL:
+        if not gtfs_content:
             LOGGER.error('Failed to download file with GTFS data.')
             return False
 
