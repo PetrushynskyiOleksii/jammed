@@ -63,20 +63,20 @@ class MongoWorker:
         return [str(document_id) for document_id in documents_ids]
 
     def update(self, query_filter, modifications, collection):
-        """Update a single document matching the filter."""
+        """Update documents matching the filter with certain modifications."""
         collection = self.__collections.get(collection)
 
         try:
-            is_updated = collection.update_one(
+            updated_docs = collection.update_many(
                 filter=query_filter,
                 update=modifications,
             ).modified_count
         except (PyMongoError, AttributeError, ValueError, TypeError) as err:
-            LOGGER.error(f'Could not update document in `{collection}`: {err}. '
+            LOGGER.error(f'Could not update document in `{collection.name}`: {err}. '
                          f'The following query was used: {query_filter}')
             return False
 
-        return bool(is_updated)
+        return updated_docs
 
     def find(self, collection, query_filter={}, order_by=None, fields=None, limit=0):
         """
@@ -91,22 +91,11 @@ class MongoWorker:
                 limit=limit,
             )
         except (PyMongoError, InvalidId, AttributeError, TypeError) as err:
-            LOGGER.error(f'Could not read data from collection {collection}'
+            LOGGER.error(f'Could not read data from collection {collection.name}'
                          f' by filer {query_filter}: {err}')
             return None
 
         return [document for document in documents]
-
-    def flush_collection(self, collection):
-        """Remove all documents in certain collection."""
-        collection = self.__collections.get(collection)
-        try:
-            nflushed = collection.remove({})
-        except PyMongoError as err:
-            LOGGER.error(f'Could not flush collection {collection}: {err}')
-            return 0
-
-        return nflushed
 
 
 MONGER = MongoWorker()
