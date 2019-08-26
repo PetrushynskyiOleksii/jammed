@@ -88,6 +88,7 @@ class GTFSCollector:
             return False
 
         graphs_data = []
+        timestamp = int(time.time())
         total_routes = total_trips = 0
         for route_id, trips in gtfs_dict.items():
             MONGER.update(
@@ -106,7 +107,7 @@ class GTFSCollector:
                 'avg_speed': route_avg_speed,
                 'trips_count': trips_count,
                 'coordinates': route_coordinates,
-                'timestamp': time.time()
+                'timestamp': timestamp
             })
 
             total_routes += 1

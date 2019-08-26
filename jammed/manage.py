@@ -38,12 +38,13 @@ def populate_db(args):
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} routes.')
 
     graphs_docs = []
+    timestamp = int(time.time())
     count_graphs_data = parse_graph_data()
     for graph_id, graph_data in count_graphs_data.items():
         graphs_docs.append({
             'id': graph_id,
             'data': graph_data,
-            'timestamp': time.time()
+            'timestamp': timestamp
         })
     inserted_cnt = MONGER.insert_many(graphs_docs, STATIC_GRAPHS_COLLECTION)
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} data items for graphs.')
@@ -64,7 +65,7 @@ def runserver(args):
     """Create Flask server and run it."""
     from api.app import create_app
     app = create_app()
-    app.run(debug=False)
+    app.run(debug=True)
 
 
 if __name__ == '__main__':

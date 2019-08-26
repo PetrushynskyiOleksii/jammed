@@ -11,6 +11,7 @@ logger = logging.getLogger('JAMMED')
 
 def create_app():
     flask_app = Flask(__name__)
+    flask_app.config['JSON_AS_ASCII'] = False
     CORS(flask_app)
     logger.info('Flask server was successfully created.')
 

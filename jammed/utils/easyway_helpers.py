@@ -12,18 +12,23 @@ from utils.constants import EASYWAY_STATIC_DIR
 
 
 STREET_PREFIXES = ['вул. ', 'пр. ', 'просп. ', 'пл. ', 'площа ', 'вулиця ']
+TRANSPORT_TYPE_MAP = {'А': 'Автобус', 'Н-А': 'Нічний Автобус', 'Т': 'Трамвай', 'Тр': 'Тролейбус'}
 
 
 def compile_gtfs(gtfs):
     """Compile GTFS data to dictionary format."""
     feed = gtfs_realtime_pb2.FeedMessage()
-    feed.ParseFromString(gtfs)
+
+    try:
+        feed.ParseFromString(gtfs)
+    except protobuf.message.DecodeError:
+        return None
 
     gtfs_dict = {}
     for entity in feed.entity:
         vehicle = entity.vehicle
         position = vehicle.position
-        route_id = int(vehicle.trip.route_id)
+        route_id = vehicle.trip.route_id
 
         if not gtfs_dict.get(route_id):
             gtfs_dict[route_id] = []
@@ -53,7 +58,7 @@ def parse_routes():
     routes = []
     for route in routes_csv:
         routes.append({
-            'id': int(route['route_id']),
+            'id': route['route_id'],
             'transport_type': re.sub(r'\d+', '', route['route_short_name']),
             'short_name': route['route_short_name'],
             'long_name': route['route_long_name'],
@@ -69,11 +74,11 @@ def parse_trips():
     """Return list of trips for every route."""
     trips_csv = load_csv(f'{EASYWAY_STATIC_DIR}/trips.txt')
 
-    trips = collections.defaultdict(list)
+    trips = collections.defaultdict(set)
     for trip in trips_csv:
         route_id = trip['route_id']
         trip_id = trip['block_id']
-        trips[route_id].append(trip_id)
+        trips[route_id].add(trip_id)
 
     return trips
 
@@ -108,7 +113,8 @@ def parse_stops_per_routes():
     """Return dict with data about number of stops per routes."""
     trips_map = {}
     routes = parse_trips()
-    for route, trips in parse_trips().items():
+    routes_map = get_routes_map()
+    for route, trips in routes.items():
         trips_map.update({trip: route for trip in trips})
 
     stops = set()
@@ -117,11 +123,12 @@ def parse_stops_per_routes():
         trip_id = stop_time['trip_id'].split('_')[0]
         stop_id = stop_time['stop_id']
         route_id = trips_map[trip_id]
-        stops.add((route_id, stop_id))
+        route_name = routes_map[route_id]
+        stops.add((route_name, stop_id))
 
-    routes = dict.fromkeys(routes.keys(), 0)
-    for route_id, stop_id in stops:
-        routes[route_id] += 1
+    routes = dict.fromkeys(routes_map.values(), 0)
+    for route_name, stop_id in stops:
+        routes[route_name] += 1
 
     return routes
 
@@ -131,8 +138,13 @@ def parse_transport_count():
     routes = parse_routes()
     trips = parse_trips()
     count_agencies = collections.Counter([route['agency_name'] for route in routes])
-    count_transport_type = collections.Counter([route['transport_type'] for route in routes])
-    count_routes = {route_id: len(set(trips_ids)) for route_id, trips_ids in trips.items()}
+
+    routes_per_type = [TRANSPORT_TYPE_MAP.get(route['transport_type'], 'Інші') for route in routes]
+    count_transport_type = collections.Counter(routes_per_type)
+
+    routes_map = get_routes_map()
+    count_routes = {routes_map[route_id]: len(set(trips_ids))
+                    for route_id, trips_ids in trips.items()}
 
     return {
         'transport_per_agencies': count_agencies,
@@ -149,3 +161,10 @@ def parse_graph_data():
     graph_data.update({'stops_per_regions': parse_stops_per_regions()})
 
     return graph_data
+
+
+def get_routes_map():
+    """Return dictionary with mapping routes_id - routes_name"""
+    routes_data = parse_routes()
+    routes_map = {route['id']: route['short_name'] for route in routes_data}
+    return routes_map
