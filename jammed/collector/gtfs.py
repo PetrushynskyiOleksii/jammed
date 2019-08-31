@@ -12,7 +12,7 @@ from utils.easyway_helpers import compile_gtfs, parse_routes
 from utils.constants import ROUTES_COLLECTION, DYNAMIC_GRAPHS_COLLECTION, VEHICLE_URL, COLLECTED_DIR
 
 
-MAX_COLLECTION_TRIES = 10
+DEFAULT_SLEEP_TIME = 10
 LOGGER = logging.getLogger('JAMMED')
 
 
@@ -21,9 +21,7 @@ class GTFSCollector:
 
     def __init__(self, frequency):
         """Initializes the new daemon instance."""
-        self.name = self.__class__.__name__
         self.collect_date = datetime.now()
-        self.is_processed = False
         self.frequency = frequency
         self.attempts = 1
         self.pid = None
@@ -54,21 +52,12 @@ class GTFSCollector:
 
         LOGGER.info(f'Successfully dumped documents to `{filename}.json`')
 
-    def start(self):
-        """Executes before Daemon instance starts to process user-defined commands."""
-        self.pid = os.getpid()
-        self.is_processed = True
-        LOGGER.info(f'{self.name} was successfully started with process id={self.pid}.')
-
-    def stop(self):
-        """Executes after Daemon instance has finished processing user-defined commands."""
-        self.is_processed = False
-        LOGGER.info(f'{self.name} with process id={self.pid} was stopped.')
-
     def run(self):
         """Implements permanent repetition for the execution of certain commands."""
-        self.start()
-        while self.is_processed:
+        self.pid = os.getpid()
+        LOGGER.info(f'{self.__class__.__name__} was successfully started with pid={self.pid}.')
+
+        while True:
             current_date = datetime.now()
             if self.collect_date.day != current_date.day:
                 self.dump_data()
@@ -78,13 +67,10 @@ class GTFSCollector:
             if executed:
                 self.attempts = 1
                 time.sleep(self.frequency)
-            elif self.attempts >= 10:
-                LOGGER.critical(f'Stopping {self.name}. '
-                                f'The maximum number of collecting attempts has been exhausted')
-                self.stop()
             else:
                 self.attempts += 1
                 LOGGER.warning(f'Could not execute collecting. Attempt #{self.attempts}')
+                time.sleep(DEFAULT_SLEEP_TIME * self.attempts)
 
     def collect(self):
         """
