@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  mongodb:
+    container_name: jammed_mongodb
+    image: mongo
+    ports:
+      - 27017:27017
+
+  app:
+    container_name: jammed_app
+    build: .
+    command: bash -c "python jammed/manage.py populate && python jammed/git stmanage.py collect 300"
+    volumes:
+      - .:/jammed
+    depends_on:
+      - mongodb
