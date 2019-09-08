@@ -8,7 +8,7 @@ from google import protobuf
 from google.transit import gtfs_realtime_pb2
 
 from utils.file_helpers import load_csv
-from utils.constants import EASYWAY_STATIC_DIR
+from settings import EASYWAY_STATIC_DIR
 
 
 STREET_PREFIXES = ['вул. ', 'пр. ', 'просп. ', 'пл. ', 'площа ', 'вулиця ']

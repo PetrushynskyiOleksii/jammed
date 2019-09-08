@@ -6,13 +6,16 @@ from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from utils.constants import ROUTES_COLLECTION, DYNAMIC_GRAPHS_COLLECTION, STATIC_GRAPHS_COLLECTION
+from settings import (
+    ROUTES_COLLECTION,
+    DYNAMIC_GRAPHS_COLLECTION,
+    STATIC_GRAPHS_COLLECTION,
+    JAMMED_COLLECTION)
 
 
 __all__ = ['MONGER']
 
-MONGO_HOST = 'localhost'
-MONGO_PORT = 27017
+MONGO_HOST = 'mongodb://mongodb:27017'
 MONGO_SERVER_TIMEOUT = 5 * 1000
 LOGGER = logging.getLogger('JAMMED')
 
@@ -20,11 +23,7 @@ LOGGER = logging.getLogger('JAMMED')
 class MongoWorker:
     """Provide functionality for MongoDB interaction."""
 
-    __client = MongoClient(
-        host=MONGO_HOST,
-        port=MONGO_PORT,
-        serverSelectionTimeoutMS=MONGO_SERVER_TIMEOUT
-    )
+    __client = MongoClient(MONGO_HOST, serverSelectionTimeoutMS=MONGO_SERVER_TIMEOUT)
     __instance = None
 
     def __new__(cls):
@@ -45,25 +44,28 @@ class MongoWorker:
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
                 DYNAMIC_GRAPHS_COLLECTION: cls.__database.dynamic_graphs,
-                STATIC_GRAPHS_COLLECTION: cls.__database.static_graphs
+                STATIC_GRAPHS_COLLECTION: cls.__database.static_graphs,
+                JAMMED_COLLECTION: cls.__database.jammed
             }
 
         return cls.__instance
 
-    def insert_many(self, documents, collection):
-        """Insert an iterable of documents to a certain collection."""
+    def insert(self, documents, collection):
+        """Insert document(s) to a certain collection."""
         collection = self.__collections.get(collection)
+
+        documents = documents if isinstance(documents, list) else [documents]
 
         try:
             documents_ids = collection.insert_many(documents).inserted_ids
         except (PyMongoError, AttributeError) as err:
-            LOGGER.error(f'Could not insert many documents: {err}')
+            LOGGER.error(f'Could not insert document(s): {err}')
             return []
 
         return [str(document_id) for document_id in documents_ids]
 
     def update(self, query_filter, modifications, collection):
-        """Update documents matching the filter with certain modifications."""
+        """Update document(s) matching the filter with certain modifications."""
         collection = self.__collections.get(collection)
 
         try:
@@ -78,7 +80,7 @@ class MongoWorker:
 
         return updated_docs
 
-    def find(self, collection, query_filter={}, order_by=None, fields=None, limit=0):
+    def find(self, collection, query_filter=None, order_by=None, fields=None, limit=0):
         """
         Retrieve the documents from a certain collection by filter."""
         collection = self.__collections.get(collection)
@@ -96,6 +98,19 @@ class MongoWorker:
             return None
 
         return [document for document in documents]
+
+    def remove(self, query_filter, collection):
+        """Delete one or more documents matching the filter."""
+        collection = self.__collections.get(collection)
+
+        try:
+            deleted_docs = collection.delete_many(query_filter).deleted_count
+        except (PyMongoError, AttributeError) as err:
+            LOGGER.error(f'Could not remove document(s) from collection {collection.name}'
+                         f' by filer {query_filter}: {err}')
+            return False
+
+        return deleted_docs
 
 
 MONGER = MongoWorker()

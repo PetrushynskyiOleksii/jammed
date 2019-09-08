@@ -5,8 +5,8 @@ import time
 import logging
 
 from mongo.worker import MONGER
-from collector.gtfs import GTFSCollector
-from utils.constants import ROUTES_COLLECTION, STATIC_GRAPHS_COLLECTION, BASE_DIR
+from collector.gtfs import GTFS_COLLECTOR
+from settings import ROUTES_COLLECTION, STATIC_GRAPHS_COLLECTION, ROOT_DIR
 from utils.easyway_helpers import parse_routes, parse_graph_data
 
 
@@ -14,7 +14,7 @@ LOGGER = logging.getLogger('JAMMED')
 LOGGER.setLevel(logging.DEBUG)
 
 c_handler = logging.StreamHandler()
-f_handler = logging.FileHandler(f'{BASE_DIR}/var/logs/jammed.log')
+f_handler = logging.FileHandler(f'{ROOT_DIR}/var/logs/jammed.log')
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 c_handler.setFormatter(formatter)
@@ -34,7 +34,7 @@ def populate_db(args):
         mongo collection.
     """
     routes = parse_routes()
-    inserted_cnt = MONGER.insert_many(routes, ROUTES_COLLECTION)
+    inserted_cnt = MONGER.insert(routes, ROUTES_COLLECTION)
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} routes.')
 
     graphs_docs = []
@@ -46,7 +46,7 @@ def populate_db(args):
             'data': graph_data,
             'timestamp': timestamp
         })
-    inserted_cnt = MONGER.insert_many(graphs_docs, STATIC_GRAPHS_COLLECTION)
+    inserted_cnt = MONGER.insert(graphs_docs, STATIC_GRAPHS_COLLECTION)
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} data items for graphs.')
 
 
@@ -57,8 +57,8 @@ def run_collector(args):
         LOGGER.error('Invalid frequency. Please provide integer number as frequency.')
         return
 
-    collector = GTFSCollector(frequency)
-    collector.run()
+    GTFS_COLLECTOR.frequency = frequency
+    GTFS_COLLECTOR.run()
 
 
 def runserver(args):

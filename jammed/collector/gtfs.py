@@ -9,7 +9,12 @@ from datetime import datetime
 from mongo.worker import MONGER
 from utils.file_helpers import download_file
 from utils.easyway_helpers import compile_gtfs, parse_routes
-from utils.constants import ROUTES_COLLECTION, DYNAMIC_GRAPHS_COLLECTION, VEHICLE_URL, COLLECTED_DIR
+from settings import (
+    ROUTES_COLLECTION,
+    DYNAMIC_GRAPHS_COLLECTION,
+    JAMMED_COLLECTION,
+    VEHICLE_URL,
+    COLLECTED_DIR)
 
 
 DEFAULT_SLEEP_TIME = 10
@@ -19,12 +24,14 @@ LOGGER = logging.getLogger('JAMMED')
 class GTFSCollector:
     """Daemon class that provides collecting GTFS data from EasyWay."""
 
-    def __init__(self, frequency):
+    pid = None
+    name = 'GTFSCollector'
+
+    def __init__(self, frequency=300):
         """Initializes the new daemon instance."""
         self.collect_date = datetime.now()
         self.frequency = frequency
         self.attempts = 1
-        self.pid = None
 
         self.static_routes = {x['id']: x['transport_type'] for x in parse_routes()}
 
@@ -52,11 +59,39 @@ class GTFSCollector:
 
         LOGGER.info(f'Successfully dumped documents to `{filename}.json`')
 
+    @classmethod
+    def start(cls):
+        """Executes before daemon instance starts to process commands."""
+        exists = MONGER.find(JAMMED_COLLECTION, query_filter={'id': cls.name})
+        if exists:
+            LOGGER.warning(f'{cls.name} is already exist with pid={exists[0].get("pid")}.')
+            return
+
+        cls.pid = os.getpid()
+        MONGER.insert({'id': cls.name, 'pid': cls.pid}, JAMMED_COLLECTION)
+        LOGGER.info(f'{cls.name} was started with pid={cls.pid}.')
+
+        return cls.pid
+
+    @classmethod
+    def stop(cls):
+        """Executes after daemon instance has finished processing commands."""
+        cls.pid = None
+        MONGER.remove({'id': cls.name}, JAMMED_COLLECTION)
+        LOGGER.info(f'{cls.name} was stopped with pid={cls.pid}.')
+
     def run(self):
         """Implements permanent repetition for the execution of certain commands."""
-        self.pid = os.getpid()
-        LOGGER.info(f'{self.__class__.__name__} was successfully started with pid={self.pid}.')
+        started = self.start()
+        if not started:
+            return
 
+        try:
+            self.repeat()
+        except KeyboardInterrupt:
+            self.stop()
+
+    def repeat(self):
         while True:
             current_date = datetime.now()
             if self.collect_date.day != current_date.day:
@@ -113,6 +148,9 @@ class GTFSCollector:
             total_routes += 1
             total_trips += trips_count
 
-        MONGER.insert_many(graphs_data, DYNAMIC_GRAPHS_COLLECTION)
+        MONGER.insert(graphs_data, DYNAMIC_GRAPHS_COLLECTION)
         LOGGER.info(f'Successfully pushed {total_trips} trips to {total_routes} routes.')
         return True
+
+
+GTFS_COLLECTOR = GTFSCollector()
