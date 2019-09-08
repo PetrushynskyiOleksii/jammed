@@ -17,8 +17,12 @@ def get_static_graphs():
     graphs_data = MONGER.find('static_graphs', fields={'_id': 0})
     for graph in graphs_data:
         graph_data = dict(sorted(graph['data'].items(), key=lambda x: x[1]))
-        start_limit = (len(graph_data) - data_limit) if (len(graph_data) - data_limit) > 0 else 0
+        limit = data_limit or len(graph_data)
+        start_limit = (len(graph_data) - limit) if (len(graph_data) - limit) > 0 else 0
         graph_data = dict(itertools.islice(graph_data.items(), start_limit, None))
         graph['data'] = [{'name': name, 'value': value} for name, value in graph_data.items()]
 
-    return jsonify(graphs_data)
+    response = jsonify(graphs_data)
+    response.cache_control.public = True
+    response.cache_control.max_age = 604800  # week in seconds
+    return response
