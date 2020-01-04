@@ -23,5 +23,4 @@ def get_static_data():
     response = jsonify(documents)
     response.cache_control.public = True
     response.cache_control.max_age = 604800  # week in seconds
-
     return response

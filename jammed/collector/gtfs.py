@@ -37,7 +37,7 @@ class GTFSCollector:
 
     def dump_data(self):
         """Dump collection data from database to file."""
-        documents = MONGER.find(collection=ROUTES_COLLECTION, fields={'_id': 0})
+        documents = MONGER.find(collection_name=ROUTES_COLLECTION, fields={'_id': 0})
         if not documents:
             LOGGER.warning(f'Could not find any document in collection {ROUTES_COLLECTION}')
             return
@@ -46,7 +46,7 @@ class GTFSCollector:
         routes_updated = MONGER.update(
             query_filter={},
             modifications=modifications,
-            collection=ROUTES_COLLECTION)
+            collection_name=ROUTES_COLLECTION)
         LOGGER.info(f'Flushed trips for {routes_updated} routes.')
 
         filename = self.collect_date.strftime('%Y%m%d')
@@ -129,7 +129,7 @@ class GTFSCollector:
             MONGER.update(
                 query_filter={'id': route_id},
                 modifications={'$push': {'trips': {'$each': trips}}},
-                collection=ROUTES_COLLECTION
+                collection_name=ROUTES_COLLECTION
             )
 
             trips_count = len(trips)

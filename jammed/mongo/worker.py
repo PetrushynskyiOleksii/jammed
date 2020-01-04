@@ -53,30 +53,30 @@ class MongoWorker:
                 JAMMED_COLLECTION: cls.__database.jammed,
                 TRANSPORT_PER_AGENCIES: cls.__database.transport_per_agencies,
                 TRANSPORT_PER_TYPE: cls.__database.transport_per_type,
-                TRANSPORT_PER_ROUTES:cls.__database.transport_per_routes,
+                TRANSPORT_PER_ROUTES: cls.__database.transport_per_routes,
                 STOPS_PER_ROUTES: cls.__database.stops_per_routes,
                 STOPS_PER_REGIONS: cls.__database.stops_per_regions
             }
 
         return cls.__instance
 
-    def insert(self, documents, collection):
+    def insert(self, documents, collection_name):
         """Insert document(s) to a certain collection."""
-        collection = self.__collections.get(collection)
+        collection = self.__collections.get(collection_name)
 
         documents = documents if isinstance(documents, list) else [documents]
 
         try:
             documents_ids = collection.insert_many(documents).inserted_ids
         except (PyMongoError, AttributeError) as err:
-            LOGGER.error(f'Could not insert document(s): {err}')
+            LOGGER.error(f'Could not insert document(s) to {collection_name}: {err}')
             return []
 
         return [str(document_id) for document_id in documents_ids]
 
-    def update(self, query_filter, modifications, collection):
+    def update(self, query_filter, modifications, collection_name):
         """Update document(s) matching the filter with certain modifications."""
-        collection = self.__collections.get(collection)
+        collection = self.__collections.get(collection_name)
 
         try:
             updated_docs = collection.update_many(
@@ -84,16 +84,16 @@ class MongoWorker:
                 update=modifications,
             ).modified_count
         except (PyMongoError, AttributeError, ValueError, TypeError) as err:
-            LOGGER.error(f'Could not update document in `{collection.name}`: {err}. '
+            LOGGER.error(f'Could not update document in `{collection_name}`: {err}. '
                          f'The following query was used: {query_filter}')
             return False
 
         return updated_docs
 
-    def find(self, collection, query_filter=None, order_by=None, fields=None, limit=0):
+    def find(self, collection_name, query_filter=None, order_by=None, fields=None, limit=0):
         """
         Retrieve the documents from a certain collection by filter."""
-        collection = self.__collections.get(collection)
+        collection = self.__collections.get(collection_name)
 
         try:
             documents = collection.find(
@@ -103,21 +103,21 @@ class MongoWorker:
                 limit=limit,
             )
         except (PyMongoError, InvalidId, AttributeError, TypeError) as err:
-            LOGGER.error(f'Could not read data from collection {collection.name}'
-                         f' by filer {query_filter}: {err}')
+            LOGGER.error(f'Could not read data from collection {collection_name}'
+                         f' by filter {query_filter}: {err}')
             return None
 
         return [document for document in documents]
 
-    def remove(self, query_filter, collection):
+    def remove(self, query_filter, collection_name):
         """Delete one or more documents matching the filter."""
-        collection = self.__collections.get(collection)
+        collection = self.__collections.get(collection_name)
 
         try:
             deleted_docs = collection.delete_many(query_filter).deleted_count
         except (PyMongoError, AttributeError) as err:
-            LOGGER.error(f'Could not remove document(s) from collection {collection.name}'
-                         f' by filer {query_filter}: {err}')
+            LOGGER.error(f'Could not remove document(s) from collection {collection_name}'
+                         f' by filter {query_filter}: {err}')
             return False
 
         return deleted_docs

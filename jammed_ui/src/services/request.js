@@ -5,11 +5,11 @@ const apiVersion = '/api/v1';
 
 
 function get(url, params){
-  url = host + apiVersion + url;
-  const response = axios.get(url, {params});
-  // TODO: implement handler for errors
+    url = host + apiVersion + url;
+    const response = axios.get(url, { params });
+    // TODO: implement handler for errors
 
-  return response
+    return response
 }
 
 

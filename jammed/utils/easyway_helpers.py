@@ -152,7 +152,7 @@ def parse_transport_count():
 
     return {
         'transport_per_agencies': agencies_count,
-        'transport_per_transport_type': transport_type_count,
+        'transport_per_type': transport_type_count,
         'transport_per_routes': routes_count,
     }
 
