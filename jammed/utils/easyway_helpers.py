@@ -106,7 +106,8 @@ def parse_stops_per_regions():
             if stop_name in streets:
                 regions[region] += 1
 
-    return regions
+    stops_count = [{"id": k, "value": v} for k, v in regions.items()]
+    return stops_count
 
 
 def parse_stops_per_routes():
@@ -130,37 +131,40 @@ def parse_stops_per_routes():
     for route_name, stop_id in stops:
         routes[route_name] += 1
 
-    return routes
+    stops_count = [{"id": k, "value": v} for k, v in routes.items()]
+    return stops_count
 
 
 def parse_transport_count():
     """Return transport count value per agency, transport type and certain route."""
     routes = parse_routes()
     trips = parse_trips()
-    count_agencies = collections.Counter([route['agency_name'] for route in routes])
+    agencies_counter = collections.Counter([route['agency_name'] for route in routes])
+    agencies_count = [{"id": k, "value": v} for k, v in agencies_counter.items()]
 
     routes_per_type = [TRANSPORT_TYPE_MAP.get(route['transport_type'], 'Інші') for route in routes]
-    count_transport_type = collections.Counter(routes_per_type)
+    transport_type_counter = collections.Counter(routes_per_type)
+    transport_type_count = [{"id": k, "value": v} for k, v in transport_type_counter.items()]
 
     routes_map = get_routes_map()
-    count_routes = {routes_map[route_id]: len(set(trips_ids))
-                    for route_id, trips_ids in trips.items()}
+    routes_count = [{"id": routes_map[route_id], "value": len(set(trips_ids))}
+                    for route_id, trips_ids in trips.items()]
 
     return {
-        'transport_per_agencies': count_agencies,
-        'transport_per_transport_type': count_transport_type,
-        'transport_per_routes': count_routes,
+        'transport_per_agencies': agencies_count,
+        'transport_per_transport_type': transport_type_count,
+        'transport_per_routes': routes_count,
     }
 
 
-def parse_graph_data():
+def parse_static_data():
     """Return dictionary with data for graphs."""
-    graph_data = {}
-    graph_data.update(parse_transport_count())
-    graph_data.update({'stops_per_routes': parse_stops_per_routes()})
-    graph_data.update({'stops_per_regions': parse_stops_per_regions()})
+    static_data = {}
+    static_data.update(parse_transport_count())
+    static_data.update({'stops_per_routes': parse_stops_per_routes()})
+    static_data.update({'stops_per_regions': parse_stops_per_regions()})
 
-    return graph_data
+    return static_data
 
 
 def get_routes_map():

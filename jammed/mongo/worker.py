@@ -9,13 +9,19 @@ from pymongo.errors import PyMongoError
 from settings import (
     ROUTES_COLLECTION,
     DYNAMIC_GRAPHS_COLLECTION,
-    STATIC_GRAPHS_COLLECTION,
-    JAMMED_COLLECTION)
+    JAMMED_COLLECTION,
+    TRANSPORT_PER_AGENCIES,
+    TRANSPORT_PER_TYPE,
+    TRANSPORT_PER_ROUTES,
+    STOPS_PER_ROUTES,
+    STOPS_PER_REGIONS)
 
 
 __all__ = ['MONGER']
 
-MONGO_HOST = 'mongodb://mongodb:27017'
+# MONGO_HOST = 'mongodb://mongodb:27017'
+MONGO_HOST = 'localhost:27017'
+
 MONGO_SERVER_TIMEOUT = 5 * 1000
 LOGGER = logging.getLogger('JAMMED')
 
@@ -44,8 +50,12 @@ class MongoWorker:
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
                 DYNAMIC_GRAPHS_COLLECTION: cls.__database.dynamic_graphs,
-                STATIC_GRAPHS_COLLECTION: cls.__database.static_graphs,
-                JAMMED_COLLECTION: cls.__database.jammed
+                JAMMED_COLLECTION: cls.__database.jammed,
+                TRANSPORT_PER_AGENCIES: cls.__database.transport_per_agencies,
+                TRANSPORT_PER_TYPE: cls.__database.transport_per_type,
+                TRANSPORT_PER_ROUTES:cls.__database.transport_per_routes,
+                STOPS_PER_ROUTES: cls.__database.stops_per_routes,
+                STOPS_PER_REGIONS: cls.__database.stops_per_regions
             }
 
         return cls.__instance

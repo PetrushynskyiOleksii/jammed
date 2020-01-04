@@ -1,13 +1,12 @@
 """This module provides project management."""
 
 import sys
-import time
 import logging
 
 from mongo.worker import MONGER
 from collector.gtfs import GTFS_COLLECTOR
-from settings import ROUTES_COLLECTION, STATIC_GRAPHS_COLLECTION, ROOT_DIR
-from utils.easyway_helpers import parse_routes, parse_graph_data
+from settings import ROUTES_COLLECTION, ROOT_DIR
+from utils.easyway_helpers import parse_routes, parse_static_data
 
 
 LOGGER = logging.getLogger('JAMMED')
@@ -37,17 +36,10 @@ def populate_db(args):
     inserted_cnt = MONGER.insert(routes, ROUTES_COLLECTION)
     LOGGER.info(f'Successfully inserted {len(inserted_cnt)} routes.')
 
-    graphs_docs = []
-    timestamp = int(time.time())
-    count_graphs_data = parse_graph_data()
-    for graph_id, graph_data in count_graphs_data.items():
-        graphs_docs.append({
-            'id': graph_id,
-            'data': graph_data,
-            'timestamp': timestamp
-        })
-    inserted_cnt = MONGER.insert(graphs_docs, STATIC_GRAPHS_COLLECTION)
-    LOGGER.info(f'Successfully inserted {len(inserted_cnt)} data items for graphs.')
+    static_data = parse_static_data()
+    for collection_id, documents in static_data.items():
+        inserted = MONGER.insert(documents, collection_id)
+        LOGGER.info(f'Successfully inserted {len(inserted)} documents to `{collection_id}``.')
 
 
 def run_collector(args):
