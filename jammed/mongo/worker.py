@@ -90,7 +90,7 @@ class MongoWorker:
 
         return updated_docs
 
-    def find(self, collection_name, query_filter=None, order_by=None, fields=None, limit=0):
+    def find(self, collection_name, query_filter=None, order_by=None, fields=None, limit=0, skip=0):
         """
         Retrieve the documents from a certain collection by filter."""
         collection = self.__collections.get(collection_name)
@@ -101,13 +101,14 @@ class MongoWorker:
                 sort=order_by,
                 projection=fields,
                 limit=limit,
+                skip=skip,
             )
         except (PyMongoError, InvalidId, AttributeError, TypeError) as err:
             LOGGER.error(f'Could not read data from collection {collection_name}'
                          f' by filter {query_filter}: {err}')
             return None
 
-        return [document for document in documents]
+        return documents
 
     def remove(self, query_filter, collection_name):
         """Delete one or more documents matching the filter."""

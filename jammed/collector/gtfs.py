@@ -52,7 +52,7 @@ class GTFSCollector:
         filename = self.collect_date.strftime('%Y%m%d')
         with open(f'{COLLECTED_DIR}/{filename}.json', 'w+') as f:
             try:
-                json.dump(documents, f)
+                json.dump(list(documents), f)
             except (TypeError, AttributeError) as err:
                 LOGGER.error(f'Could not deserialize documents: {err}')
                 return

@@ -13,7 +13,7 @@ export default function renderLoader(text) {
             <Loader
                 type="ThreeDots"
                 color="#767676"
-                height="30"
+                height={30}
             />
         </div>
     )
