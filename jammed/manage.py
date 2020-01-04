@@ -39,7 +39,7 @@ def populate_db(args):
     static_data = parse_static_data()
     for collection_id, documents in static_data.items():
         inserted = MONGER.insert(documents, collection_id)
-        LOGGER.info(f'Successfully inserted {len(inserted)} documents to `{collection_id}``.')
+        LOGGER.info(f'Successfully inserted {len(inserted)} documents to `{collection_id}`.')
 
 
 def run_collector(args):
