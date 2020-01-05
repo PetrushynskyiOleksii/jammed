@@ -14,12 +14,17 @@ export default class BarTile extends Component {
         limit: 10,
         skip: 0,
         count: 0,
+        max: 0,
     };
 
     componentDidMount() {
         this.queryCount();
         this.queryData();
     }
+
+    yDomain() {
+        return [0, this.state.max]
+    };
 
     queryCount = () => {
         const { url, id } = this.props;
@@ -33,13 +38,15 @@ export default class BarTile extends Component {
 
     queryData = () => {
         const { url, id } = this.props;
-        const { skip, limit } = this.state;
+        const { skip, limit, max } = this.state;
         request.get(url, { id, limit, skip })
             .then(response => {
+                const { data } = response;
                 this.setState({
                     'loading': false,
                     'error': false,
-                    'data': response.data
+                    'data': data,
+                    'max': skip ? max: Math.ceil(data[0].value / 10) * 10
                 });
             })
             .catch(() => {
@@ -77,7 +84,7 @@ export default class BarTile extends Component {
                 <div className="chart-title">{title}</div>
                 <BarChart width={400} height={275} data={this.state.data}>
                     <XAxis interval={0} stroke="#c6c6c6" dataKey="id" />
-                    <YAxis stroke="#c6c6c6" />
+                    <YAxis domain={this.yDomain()} stroke="#c6c6c6" />
                     <Bar dataKey="value" fill="#d3864d" opacity={0.5} />
                 </BarChart>
             </div>
