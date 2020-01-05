@@ -1,0 +1,31 @@
+.nav {
+    display: flex;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 85%;
+    width: 100px;
+}
+
+.nav-label {
+    color: #767676;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.nav-button {
+    margin-bottom: 25px;
+}
+
+.nav-button:hover > .nav-label,
+.nav-button:hover > .icon {
+    color: #c6c6c6 !important;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.nav-button-active > .icon,
+.nav-button-active > .nav-label {
+    color: #d3864d !important;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}

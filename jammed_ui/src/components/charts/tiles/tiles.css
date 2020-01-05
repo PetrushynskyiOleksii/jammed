@@ -1,0 +1,9 @@
+.recharts-text {
+    fill: #c6c6c6;
+}
+
+.recharts-radar,
+.recharts-rectangle {
+    fill: #d3864d;
+    opacity: 0.5;
+}

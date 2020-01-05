@@ -7,7 +7,6 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 25px 0 100px 0;
 }
 
 .chart-cell {
@@ -23,11 +22,10 @@
 }
 
 .chart-title {
+    color: #767676;
     align-self: flex-end;
     margin: 10px 15px 0 0;
-    color: #767676;
     text-transform: uppercase;
-    letter-spacing: 1px;
     cursor: pointer;
 }
 

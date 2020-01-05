@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 
-import renderLoader from "../utils/preloader";
-import renderError from "../utils/error";
-import request from "../../../services/request";
+import request from "../../services/request";
+import { ChartTitle, ChartLoader, ChartError, ChartCell } from "../chart";
+
+import './tiles.css';
 
 
-export default class BarTile extends Component {
+export default class BarTile extends React.Component {
     state = {
         data: [],
         loading: true,
@@ -58,36 +59,37 @@ export default class BarTile extends Component {
 
     nextPage = () => {
         const { limit, skip, count } = this.state;
-        if (skip + limit >= count) return;
-        this.setState({
-            skip: skip + limit
-        }, this.queryData);
+        if (skip + limit < count) {
+            this.setState({
+                skip: skip + limit
+            }, this.queryData);
+        }
     };
 
     prevPage = () => {
-        const {limit, skip} = this.state;
-        if (!skip) return;
-        this.setState({
-            skip: Math.max(skip - limit, 0)
-        }, this.queryData);
+        const { limit, skip } = this.state;
+        if (skip > 0) {
+            this.setState({
+                skip: Math.max(skip - limit, 0)
+            }, this.queryData);
+        }
     };
 
     render() {
-        if (this.state.error) return renderError("Data could not be loaded.");
-        if (this.state.loading) return renderLoader("Loading data...");
+        if (this.state.error) return <ChartError text="Data could not be loaded."/>;
+        if (this.state.loading) return <ChartLoader text="Loading data..." />;
 
-        const title = this.props.id.replace(/_/g, ' ');
         return (
-            <div className="chart-cell"
-                onClick={this.nextPage}
-                onContextMenu={this.prevPage}>
-                <div className="chart-title">{title}</div>
-                <BarChart width={400} height={275} data={this.state.data}>
-                    <XAxis interval={0} stroke="#c6c6c6" dataKey="id" />
-                    <YAxis domain={this.yDomain()} stroke="#c6c6c6" />
-                    <Bar dataKey="value" fill="#d3864d" opacity={0.5} />
-                </BarChart>
-            </div>
+            <ChartCell>
+                <ChartTitle title={this.props.id}/>
+                <div onClick={this.nextPage} onContextMenu={this.prevPage}>
+                    <BarChart width={400} height={275} data={this.state.data}>
+                        <XAxis dataKey="id" interval={0} />
+                        <YAxis domain={this.yDomain()} />
+                        <Bar dataKey="value" />
+                    </BarChart>
+                </div>
+            </ChartCell>
         )
     }
 }

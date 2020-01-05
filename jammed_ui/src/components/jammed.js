@@ -1,14 +1,25 @@
-import React, {Component} from 'react';
-import Graphs from "./graphs/graphs";
+import React from 'react';
+import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+
+import StaticCharts from "./charts/static";
+import Navigation from "./main/navigation"
 
 import './jammed.css';
 
 
-export default class Jammed extends Component {
+export default class Jammed extends React.Component {
     render() {
         return (
             <div>
-                <Graphs/>
+                <Router>
+                    <Navigation />
+                    <Switch>
+                        <Route path="/static" component={StaticCharts}/>
+                        <Route path="/dynamic" />
+                        <Route path="/predict" />
+                        <Redirect path="*" to="/static"/>
+                    </Switch>
+                </Router>
             </div>
         );
     }

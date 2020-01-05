@@ -1,10 +1,22 @@
 @import url('https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz&display=swap');
 
 body {
-    background-color: #0f0f0f;
+    background-color: #0a0a0a;
     font-family: 'Yanone Kaffeesatz', sans-serif;
+    margin: 25px 0 100px 0;
 }
+
+a {
+    text-decoration: none;
+}
+
+.MuiSvgIcon-root {
+    color: #767676 !important;
+    font-size: 40px !important;
+}
+
 
 ::selection {
     color: #c6c6c6;
 }
+

@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
     RadarChart, PolarGrid, PolarRadiusAxis, PolarAngleAxis, Radar
 } from 'recharts';
 
-import renderLoader from "../utils/preloader";
-import renderError from "../utils/error";
-import request from "../../../services/request";
+import request from "../../services/request";
+import { ChartTitle, ChartLoader, ChartError, ChartCell } from "../chart";
+
+import './tiles.css';
 
 
-export default class RadarTile extends Component {
+export default class RadarTile extends React.Component {
     state = {
         loading: true,
         error: false,
@@ -37,20 +38,19 @@ export default class RadarTile extends Component {
     };
 
     render() {
-        if (this.state.error) return renderError("Data could not be loaded.");
-        if (this.state.loading) return renderLoader("Loading data...");
+        if (this.state.error) return <ChartError text="Data could not be loaded."/>;
+        if (this.state.loading) return <ChartLoader text="Loading data..." />;
 
-        const title = this.props.id.replace(/_/g, ' ');
         return (
-            <div className="chart-cell ">
-                <div className="chart-title">{title}</div>
+            <ChartCell>
+                <ChartTitle title={this.props.id}/>
                 <RadarChart width={500} height={275} data={this.state.data}>
                     <PolarGrid />
                     <PolarRadiusAxis />
-                    <PolarAngleAxis stroke="#c6c6c6" dataKey="id"/>
-                    <Radar dataKey="value" fill="#d3864d" fillOpacity={0.5}/>
+                    <PolarAngleAxis dataKey="id"/>
+                    <Radar dataKey="value" />
                 </RadarChart>
-            </div>
+            </ChartCell>
         )
     }
 }
