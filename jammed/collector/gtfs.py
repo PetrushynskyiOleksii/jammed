@@ -11,7 +11,7 @@ from utils.file_helpers import download_file
 from utils.easyway_helpers import compile_gtfs, parse_routes
 from settings import (
     ROUTES_COLLECTION,
-    DYNAMIC_GRAPHS_COLLECTION,
+    TIMESERIES_COLLECTION,
     JAMMED_COLLECTION,
     VEHICLE_URL,
     COLLECTED_DIR)
@@ -33,7 +33,9 @@ class GTFSCollector:
         self.frequency = frequency
         self.attempts = 1
 
-        self.static_routes = {x['id']: x['transport_type'] for x in parse_routes()}
+        routes = parse_routes()
+        self.route_types = {x['id']: x['transport_type'] for x in routes}
+        self.route_names = {x['id']: x['short_name'] for x in routes}
 
     def dump_data(self):
         """Dump collection data from database to file."""
@@ -63,8 +65,8 @@ class GTFSCollector:
     def start(cls):
         """Executes before daemon instance starts to process commands."""
         exists = MONGER.find(JAMMED_COLLECTION, query_filter={'id': cls.name})
-        if exists:
-            LOGGER.warning(f'{cls.name} is already exist with pid={exists[0].get("pid")}.')
+        if exists.count():
+            LOGGER.warning(f'{cls.name} is already exist with pid={exists.next().get("pid")}.')
             return
 
         cls.pid = os.getpid()
@@ -76,9 +78,9 @@ class GTFSCollector:
     @classmethod
     def stop(cls):
         """Executes after daemon instance has finished processing commands."""
-        cls.pid = None
         MONGER.remove({'id': cls.name}, JAMMED_COLLECTION)
         LOGGER.info(f'{cls.name} was stopped with pid={cls.pid}.')
+        cls.pid = None
 
     def run(self):
         """Implements permanent repetition for the execution of certain commands."""
@@ -131,24 +133,31 @@ class GTFSCollector:
                 modifications={'$push': {'trips': {'$each': trips}}},
                 collection_name=ROUTES_COLLECTION
             )
+            route_speeds = [trip['speed'] for trip in trips]
+            route_avg_speed = sum(route_speeds) / len(route_speeds)
 
-            trips_count = len(trips)
-            route_speeds = [trip['speed'] for trip in trips if trip['speed'] > 0]
-            route_avg_speed = sum(route_speeds) / trips_count
-            route_coordinates = [(trip['latitude'], trip['longitude']) for trip in trips]
+            route_trips = {}
+            for trip in trips:
+                route_trips[trip["trip_id"]] = {
+                    "coordinates": (trip['latitude'], trip['longitude']),
+                    "speed": trip["speed"],
+                    "odometer": trip["odometer"]
+                }
+
             graphs_data.append({
                 'route_id': route_id,
-                'route_type': self.static_routes.get(route_id),
+                'route_name': self.route_names.get(route_id),
+                'route_type': self.route_types.get(route_id),
                 'avg_speed': route_avg_speed,
-                'trips_count': trips_count,
-                'coordinates': route_coordinates,
+                'trips_count': len(trips),
+                'route_trips': route_trips,
                 'timestamp': timestamp
             })
 
             total_routes += 1
-            total_trips += trips_count
+            total_trips += len(trips)
 
-        MONGER.insert(graphs_data, DYNAMIC_GRAPHS_COLLECTION)
+        MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
         LOGGER.info(f'Successfully pushed {total_trips} trips to {total_routes} routes.')
         return True
 

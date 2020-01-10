@@ -8,7 +8,7 @@ from pymongo.errors import PyMongoError
 
 from settings import (
     ROUTES_COLLECTION,
-    DYNAMIC_GRAPHS_COLLECTION,
+    TIMESERIES_COLLECTION,
     JAMMED_COLLECTION,
     TRANSPORT_PER_AGENCIES,
     TRANSPORT_PER_TYPE,
@@ -49,7 +49,7 @@ class MongoWorker:
             cls.__database = cls.__client.jammed
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
-                DYNAMIC_GRAPHS_COLLECTION: cls.__database.dynamic_graphs,
+                TIMESERIES_COLLECTION: cls.__database.timeseries,
                 JAMMED_COLLECTION: cls.__database.jammed,
                 TRANSPORT_PER_AGENCIES: cls.__database.transport_per_agencies,
                 TRANSPORT_PER_TYPE: cls.__database.transport_per_type,

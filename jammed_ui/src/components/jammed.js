@@ -2,6 +2,7 @@ import React from 'react';
 import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
 
 import StaticCharts from "./charts/static";
+import TransportCharts from "./charts/transport";
 import Navigation from "./main/navigation"
 
 import './jammed.css';
@@ -15,8 +16,7 @@ export default class Jammed extends React.Component {
                     <Navigation />
                     <Switch>
                         <Route path="/static" component={StaticCharts}/>
-                        <Route path="/dynamic" />
-                        <Route path="/predict" />
+                        <Route path="/transport" component={TransportCharts} />
                         <Redirect path="*" to="/static"/>
                     </Switch>
                 </Router>

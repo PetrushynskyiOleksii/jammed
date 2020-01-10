@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import BarChartOutlinedIcon from '@material-ui/icons/BarChartOutlined';
-import UpdateRoundedIcon from '@material-ui/icons/UpdateRounded';
 
 import './main.css';
 
@@ -43,11 +42,8 @@ export default class Navigation extends React.Component {
                 <NavigationButton label="static" active={active} onClick={this.handleChange}>
                     <BarChartOutlinedIcon className="icon"/>
                 </NavigationButton>
-                <NavigationButton label="dynamic" active={active} onClick={this.handleChange}>
+                <NavigationButton label="transport" active={active} onClick={this.handleChange}>
                     <TrendingUpIcon className="icon"/>
-                </NavigationButton>
-                <NavigationButton label="predict" active={active} onClick={this.handleChange}>
-                    <UpdateRoundedIcon className="icon"/>
                 </NavigationButton>
             </div>
         );

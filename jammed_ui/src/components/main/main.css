@@ -10,11 +10,13 @@
 
 .nav-label {
     color: #767676;
-    text-align: center;
     text-transform: uppercase;
 }
 
 .nav-button {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
     margin-bottom: 25px;
 }
 

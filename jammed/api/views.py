@@ -1,10 +1,20 @@
 """This module provides views API."""
 
+from datetime import datetime
+
 from flask import Blueprint, jsonify, request
 
+from settings import TIMESERIES_COLLECTION
 from mongo.worker import MONGER
 
+
 JAMMED = Blueprint('jammed', __name__)
+
+
+def get_time_range(delta):
+    end = int(datetime.now().timestamp())
+    start = end - delta
+    return start, end
 
 
 @JAMMED.route('/static', methods=['GET'])
@@ -44,3 +54,30 @@ def get_static_data_count():
 
     response = jsonify({"count": documents.count()})
     return response
+
+
+@JAMMED.route('/timeseries', methods=['GET'])
+def get_timeseries():
+    """Return json response with timeseries from easyway."""
+    delta = request.args.get("delta", type=int, default=3600)
+    route_name = request.args.get("route_name")
+    units = request.args.getlist("units[]")
+
+    fields = {"_id": 0}
+    fields.update({unit: 1 for unit in units})
+
+    start, end = get_time_range(delta)
+    try:
+        documents = MONGER.find(
+            TIMESERIES_COLLECTION,
+            query_filter={
+                "route_name": route_name,
+                "timestamp": {"$gte": start, "$lte": end}
+            },
+            fields=fields
+        )
+    except AttributeError:
+        message = "Could not connect to database."
+        return jsonify({"error": message}), 400
+
+    return jsonify(list(documents))
