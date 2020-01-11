@@ -138,8 +138,11 @@ class GTFSCollector:
 
             route_trips = {}
             for trip in trips:
-                route_trips[trip["trip_id"]] = {
-                    "coordinates": (trip['latitude'], trip['longitude']),
+                route_trips[trip["license_plate"]] = {
+                    "coordinates": {
+                        "latitude": trip['latitude'],
+                        "longitude": trip['longitude']
+                    },
                     "speed": trip["speed"],
                     "odometer": trip["odometer"]
                 }

@@ -61,10 +61,7 @@ def get_timeseries():
     """Return json response with timeseries from easyway."""
     delta = request.args.get("delta", type=int, default=3600)
     route_name = request.args.get("route_name")
-    units = request.args.getlist("units[]")
-
-    fields = {"_id": 0}
-    fields.update({unit: 1 for unit in units})
+    units = request.args.get("units")
 
     start, end = get_time_range(delta)
     try:
@@ -74,10 +71,34 @@ def get_timeseries():
                 "route_name": route_name,
                 "timestamp": {"$gte": start, "$lte": end}
             },
-            fields=fields
+            fields={"_id": 0, "timestamp": 1, units: 1}
         )
     except AttributeError:
         message = "Could not connect to database."
         return jsonify({"error": message}), 400
 
     return jsonify(list(documents))
+
+
+@JAMMED.route('/timeseries/coordinates', methods=['GET'])
+def get_timeseries_coordinates():
+    """Return coordinates for certain route from timeseries collection."""
+    route_name = request.args.get("route_name")
+    try:
+        documents = MONGER.find(
+            TIMESERIES_COLLECTION,
+            query_filter={"route_name": route_name},
+            fields={"_id": 0, "timestamp": 1, "route_trips": 1},
+            order_by=[("timestamp", 1)],
+            limit=1
+        )
+    except AttributeError:
+        message = "Could not connect to database."
+        return jsonify({"error": message}), 400
+
+    document = documents.next()
+    coordinates = [x["coordinates"] for x in document["route_trips"].values()]
+    return jsonify({
+        "timestamp": document["timestamp"],
+        "coordinates": coordinates
+    })

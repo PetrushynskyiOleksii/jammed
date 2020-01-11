@@ -23,8 +23,7 @@ export default class LineTile extends React.Component {
     queryData = () => {
         const { delta } = this.state;
         const { url, route_name, id } = this.props;
-        const units = [id, "timestamp"];
-        request.get(url, { route_name, delta, units })
+        request.get(url, { route_name, delta, units: id })
             .then(response => {
                 this.setState({
                     'loading': false,
@@ -47,13 +46,15 @@ export default class LineTile extends React.Component {
     };
 
     render() {
-        if (this.state.error) return <ChartError text="Data could not be loaded."/>;
-        if (this.state.loading) return <ChartLoader text="Loading data..." />;
+        const { error, loading, data } = this.state;
+        if (error) return <ChartError text="Data could not be loaded."/>;
+        if (loading) return <ChartLoader text="Loading data..." />;
+        if (!data.length) return <ChartError text="No data points." />;
 
         return (
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
-                <LineChart width={435} height={275} data={this.state.data} >
+                <LineChart width={435} height={250} data={this.state.data} >
                     <XAxis interval={3} dataKey="timestamp" tickFormatter={this.formatTicks}/>
                     <YAxis domain={['auto', 'auto']}/>
                     <Line strokeWidth={1.5}

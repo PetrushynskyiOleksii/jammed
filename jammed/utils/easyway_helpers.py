@@ -35,6 +35,7 @@ def compile_gtfs(gtfs):
         vehicle = entity.vehicle
         position = vehicle.position
         route_id = vehicle.trip.route_id
+        license_plate = vehicle.vehicle.license_plate.replace('-', '')
 
         if not gtfs_dict.get(route_id):
             gtfs_dict[route_id] = []
@@ -44,7 +45,7 @@ def compile_gtfs(gtfs):
             'timestamp': vehicle.timestamp,
             'trip_id': vehicle.trip.trip_id,
             'vehicle_id': vehicle.vehicle.id,
-            'license_plate': vehicle.vehicle.license_plate,
+            'license_plate': license_plate,
             'latitude': position.latitude,
             'longitude': position.longitude,
             'odometer': position.odometer,
