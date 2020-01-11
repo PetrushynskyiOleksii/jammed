@@ -11,6 +11,7 @@ export default class TransportCharts extends React.Component {
             <ChartContainer>
                 <LineTile id="trips_count" url="/timeseries" route_name="А47" />
                 <LineTile id="avg_speed" url="/timeseries" route_name="А47" />
+                <LineTile id="avg_distance" url="/timeseries" route_name="А47" />
                 <ScatterTile id="coordinates" url="/timeseries/coordinates" route_name="А47"/>
             </ChartContainer>
         )

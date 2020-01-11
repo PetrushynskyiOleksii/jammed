@@ -32,6 +32,7 @@ class GTFSCollector:
         self.collect_date = datetime.now()
         self.frequency = frequency
         self.attempts = 1
+        self.prev_odometers = {}
 
         routes = parse_routes()
         self.route_types = {x['id']: x['transport_type'] for x in routes}
@@ -126,7 +127,6 @@ class GTFSCollector:
 
         graphs_data = []
         timestamp = int(time.time())
-        total_routes = total_trips = 0
         for route_id, trips in gtfs_dict.items():
             MONGER.update(
                 query_filter={'id': route_id},
@@ -138,30 +138,37 @@ class GTFSCollector:
 
             route_trips = {}
             for trip in trips:
+                vehicle_id = trip["vehicle_id"]
+                curr_odometer = trip["odometer"]
+                prev_odometer = self.prev_odometers.get(vehicle_id, curr_odometer)
+                self.prev_odometers[vehicle_id] = curr_odometer
+
                 route_trips[trip["license_plate"]] = {
                     "coordinates": {
                         "latitude": trip['latitude'],
                         "longitude": trip['longitude']
                     },
                     "speed": trip["speed"],
-                    "odometer": trip["odometer"]
+                    "odometer": curr_odometer,
+                    "distance": curr_odometer - prev_odometer
                 }
+
+            route_distances = [x["distance"] for x in route_trips.values()]
+            route_avg_distance = sum(route_distances) / len(route_distances)
 
             graphs_data.append({
                 'route_id': route_id,
                 'route_name': self.route_names.get(route_id),
                 'route_type': self.route_types.get(route_id),
                 'avg_speed': route_avg_speed,
+                'avg_distance': route_avg_distance,
                 'trips_count': len(trips),
                 'route_trips': route_trips,
                 'timestamp': timestamp
             })
 
-            total_routes += 1
-            total_trips += len(trips)
-
-        MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
-        LOGGER.info(f'Successfully pushed {total_trips} trips to {total_routes} routes.')
+        inserted_count = MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
+        LOGGER.info(f'Successfully pushed {len(inserted_count)} routes.')
         return True
 
 

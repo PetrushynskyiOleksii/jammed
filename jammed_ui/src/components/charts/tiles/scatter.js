@@ -43,7 +43,6 @@ export default class ScatterTile extends React.Component {
         if (loading) return <ChartLoader text="Loading data..." />;
         if (!data.length) return <ChartError text="No data points." />;
 
-
         return (
             <ChartCell>
                 <ChartTitle title={this.props.id}/>

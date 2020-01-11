@@ -68,4 +68,3 @@ export default class LineTile extends React.Component {
         )
     }
 }
-
