@@ -38,7 +38,7 @@ export default class RadarTile extends React.Component {
     };
 
     render() {
-        if (this.state.error) return <ChartError text="Data could not be loaded."/>;
+        if (this.state.error) return <ChartError text="Data could not be loaded." icon="error"/>;
         if (this.state.loading) return <ChartLoader text="Loading data..." />;
 
         return (

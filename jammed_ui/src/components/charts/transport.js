@@ -9,7 +9,7 @@ import LineTile from "./tiles/line";
 import ScatterTile from "./tiles/scatter"
 import { ChartContainer } from "./chart";
 
-import "./dialog.css"
+import "./search.css"
 
 
 export default class TransportCharts extends React.Component {
@@ -25,7 +25,7 @@ export default class TransportCharts extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <ChartContainer>
                     <LineTile id="trips_count" url="/timeseries" route_name="А47" />
                     <LineTile id="avg_speed" url="/timeseries" route_name="А47" />
@@ -38,7 +38,7 @@ export default class TransportCharts extends React.Component {
                     <DialogTitle>TODO</DialogTitle>
                     <DialogContent>TODO</DialogContent>
                 </Dialog>
-            </div>
+            </React.Fragment>
         )
     }
 }

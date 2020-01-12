@@ -2,29 +2,8 @@ import React from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis } from 'recharts';
 
 import request from "../../services/request";
-import { ChartTitle, ChartLoader, ChartError, ChartCell } from "../chart";
-
-
-class ScatterTimestamp extends React.Component {
-
-    formatTimestamp = (timestamp) => {
-        const ts = new Date(1000 * timestamp);
-        const hours = (ts.getHours() < 10 ? '0' : '') + ts.getHours();
-        const minutes = (ts.getMinutes() < 10 ? '0' : '') + ts.getMinutes();
-        return `${hours}:${minutes}`
-    };
-
-    render() {
-        const { timestamp, hide } = this.props;
-        if (hide) return null;
-
-        return (
-            <div className="scatter-timestamp">
-                {this.formatTimestamp(timestamp)}
-            </div>
-        )
-    }
-}
+import { ChartTitle, ChartLoader, ChartError, ChartCell, ChartLastValue } from "../chart";
+import { formatTimestamp } from "../../services/utils";
 
 
 export default class ScatterTile extends React.Component {
@@ -34,7 +13,7 @@ export default class ScatterTile extends React.Component {
         loading: true,
         error: false,
         timestamp: null,
-        hideTimestamp: true
+        hide: true
     };
 
     componentDidMount() {
@@ -49,7 +28,6 @@ export default class ScatterTile extends React.Component {
         clearInterval(this.interval);
     }
 
-
     queryData = () => {
         const { url, route_name, field } = this.props;
         request.get(url, { route_name, field, delta: this.delta })
@@ -59,7 +37,7 @@ export default class ScatterTile extends React.Component {
                     'loading': false,
                     'error': false,
                     'data': coordinates,
-                    'timestamp': timestamp
+                    'timestamp': formatTimestamp(timestamp)
                 });
             })
             .catch(() => {
@@ -69,23 +47,21 @@ export default class ScatterTile extends React.Component {
             })
     };
 
-    toggleTimestamp = () => {
-        this.setState(prevState => ({
-            hideTimestamp: !prevState.hideTimestamp
-        }));
+    toggleHide = () => {
+        this.setState(prev => ({ hide: !prev.hide }))
     };
 
     render() {
-        const { error, loading, data, timestamp, hideTimestamp } = this.state;
-        if (error) return <ChartError text="Data could not be loaded."/>;
+        const { error, loading, data, timestamp, hide } = this.state;
+        if (error) return <ChartError text="Data could not be loaded." icon="error"/>;
         if (loading) return <ChartLoader text="Loading data..." />;
-        if (!data.length) return <ChartError text="No data points." />;
+        if (!data.length) return <ChartError text="No data points." icon="warning"/>;
 
         return (
-            <div onMouseEnter={this.toggleTimestamp} onMouseLeave={this.toggleTimestamp}>
+            <div onMouseEnter={this.toggleHide} onMouseLeave={this.toggleHide}>
                 <ChartCell>
                     <ChartTitle title={this.props.id}/>
-                    <ScatterTimestamp timestamp={timestamp} hide={hideTimestamp} />
+                    {!hide && <ChartLastValue value={timestamp} />}
                     <ScatterChart width={435} height={250}>
                         <XAxis domain={['auto', 'auto']} type="number" dataKey="latitude" />
                         <YAxis domain={['auto', 'auto']} dataKey="longitude" />

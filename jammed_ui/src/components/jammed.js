@@ -11,7 +11,7 @@ import './jammed.css';
 export default class Jammed extends React.Component {
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <Router>
                     <Navigation />
                     <Switch>
@@ -20,7 +20,7 @@ export default class Jammed extends React.Component {
                         <Redirect path="*" to="/static"/>
                     </Switch>
                 </Router>
-            </div>
+            </React.Fragment>
         );
     }
 }

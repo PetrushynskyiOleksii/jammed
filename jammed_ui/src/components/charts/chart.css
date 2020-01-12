@@ -32,3 +32,10 @@
 .chart-title:hover {
     color: #c6c6c6
 }
+
+.chart-last-value {
+    position: absolute;
+    font-size: 40px;
+    color: #767676;
+    opacity: 0.5;
+}
