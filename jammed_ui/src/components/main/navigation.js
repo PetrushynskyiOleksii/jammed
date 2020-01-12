@@ -29,7 +29,10 @@ class NavigationButton extends React.Component {
 
 
 export default class Navigation extends React.Component {
-    state = { active: "static" };
+
+    state = {
+        active: window.location.pathname.replace("/", "")
+    };
 
     handleChange = (label) => {
         this.setState({ active: label })

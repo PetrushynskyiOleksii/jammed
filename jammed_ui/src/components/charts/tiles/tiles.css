@@ -11,3 +11,10 @@
 .recharts-symbols {
     fill: #d3864d;
 }
+
+.scatter-timestamp {
+    position: absolute;
+    font-size: 40px;
+    color: #767676;
+    opacity: 0.25;
+}

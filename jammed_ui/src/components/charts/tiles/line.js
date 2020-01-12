@@ -18,7 +18,15 @@ export default class LineTile extends React.Component {
 
     componentDidMount() {
         this.queryData();
+        this.interval = setInterval(() => {
+            this.setState({ loading: true });
+            this.queryData();
+        }, 300 * 1000)
     };
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
 
     queryData = () => {
         const { delta } = this.state;
@@ -55,8 +63,13 @@ export default class LineTile extends React.Component {
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
                 <LineChart width={435} height={250} data={this.state.data} >
-                    <XAxis interval={3} dataKey="timestamp" tickFormatter={this.formatTicks}/>
-                    <YAxis domain={['auto', 'auto']}/>
+                    <XAxis interval="preserveStartEnd" domain={["auto", "auto"]}
+                           type="number"
+                           dataKey="timestamp"
+                           tickFormatter={this.formatTicks}
+                           tickCount={6}
+                    />
+                    <YAxis domain={["auto", "auto"]}/>
                     <Line strokeWidth={1.5}
                           stroke="#d3864d"
                           type="monotone"
