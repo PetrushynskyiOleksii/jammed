@@ -10,7 +10,7 @@ import './chart.css';
 
 export class ChartContainer extends React.Component {
     disableContextMenu = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
     };
 
     render() {
@@ -25,9 +25,15 @@ export class ChartContainer extends React.Component {
 
 export class ChartTitle extends React.Component {
     render() {
-        const title = this.props.title.replace(/_/g, ' ')
+        const { title, routeName } = this.props;
+        const formattedTitle = title.replace(/_/g, ' ')
         return (
-            <div className="chart-title">{title}</div>
+            <div className="chart-title">
+                {formattedTitle}{routeName && " / "}
+                <span className="chart-route-title">
+                    {this.props.routeName}
+                </span>
+            </div>
         );
     }
 }

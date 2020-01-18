@@ -46,11 +46,11 @@ class GTFSCollector:
             return
 
         modifications = {'$set': {'trips': []}}
-        routes_updated = MONGER.update(
+        modified_count = MONGER.update(
             query_filter={},
             modifications=modifications,
             collection_name=ROUTES_COLLECTION)
-        LOGGER.info(f'Flushed trips for {routes_updated} routes.')
+        LOGGER.info(f'Flushed trips for {modified_count} routes.')
 
         filename = self.collect_date.strftime('%Y%m%d')
         with open(f'{COLLECTED_DIR}/{filename}.json', 'w+') as f:
@@ -159,7 +159,7 @@ class GTFSCollector:
             graphs_data.append({
                 'route_id': route_id,
                 'route_name': self.route_names.get(route_id),
-                'route_type': self.route_types.get(route_id),
+                'route_type': self.route_types.get(route_id, "Інші"),
                 'avg_speed': route_avg_speed,
                 'avg_distance': route_avg_distance,
                 'trips_count': len(trips),
@@ -167,8 +167,8 @@ class GTFSCollector:
                 'timestamp': timestamp
             })
 
-        inserted_count = MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
-        LOGGER.info(f'Successfully pushed {len(inserted_count)} routes.')
+        inserted_ids = MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
+        LOGGER.info(f'Successfully pushed {len(inserted_ids)} routes.')
         return True
 
 

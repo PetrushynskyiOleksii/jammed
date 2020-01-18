@@ -2,7 +2,6 @@
 
 import logging
 
-from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
@@ -79,49 +78,61 @@ class MongoWorker:
         collection = self.__collections.get(collection_name)
 
         try:
-            updated_docs = collection.update_many(
+            modified_count = collection.update_many(
                 filter=query_filter,
                 update=modifications,
             ).modified_count
-        except (PyMongoError, AttributeError, ValueError, TypeError) as err:
+        except (PyMongoError, AttributeError) as err:
             LOGGER.error(f'Could not update document in `{collection_name}`: {err}. '
                          f'The following query was used: {query_filter}')
-            return False
+            return 0
 
-        return updated_docs
+        return modified_count
 
     def find(self, collection_name, query_filter=None, order_by=None, fields=None, limit=0, skip=0):
-        """
-        Retrieve the documents from a certain collection by filter."""
+        """Retrieve the documents from a certain collection by filter."""
         collection = self.__collections.get(collection_name)
 
         try:
-            documents = collection.find(
+            cursor = collection.find(
                 filter=query_filter,
                 sort=order_by,
                 projection=fields,
                 limit=limit,
                 skip=skip,
             )
-        except (PyMongoError, InvalidId, AttributeError, TypeError) as err:
-            LOGGER.error(f'Could not read data from collection {collection_name}'
+        except (PyMongoError, AttributeError) as err:
+            LOGGER.error(f'Could not find documents in collection {collection_name}'
                          f' by filter {query_filter}: {err}')
             return None
 
-        return documents
+        return cursor
+
+    def aggregate(self, collection_name, pipeline):
+        """Return aggregated data by pipeline."""
+        collection = self.__collections.get(collection_name)
+
+        try:
+            cursor = collection.aggregate(pipeline)
+        except (PyMongoError, AttributeError) as err:
+            LOGGER.error(f'Could not aggregate data in collection {collection_name}'
+                         f' by pipeline {pipeline}: {err}')
+            return None
+
+        return cursor
 
     def remove(self, query_filter, collection_name):
         """Delete one or more documents matching the filter."""
         collection = self.__collections.get(collection_name)
 
         try:
-            deleted_docs = collection.delete_many(query_filter).deleted_count
+            deleted_count = collection.delete_many(query_filter).deleted_count
         except (PyMongoError, AttributeError) as err:
             LOGGER.error(f'Could not remove document(s) from collection {collection_name}'
                          f' by filter {query_filter}: {err}')
-            return False
+            return 0
 
-        return deleted_docs
+        return deleted_count
 
 
 MONGER = MongoWorker()

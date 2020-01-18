@@ -15,14 +15,12 @@ export default class SearchDialog extends React.Component {
         error: false,
     };
 
-    url = "/routes";
-
     componentDidMount() {
         this.queryData()
     }
 
     queryData = () => {
-        request.get(this.url)
+        request.get("/routes")
             .then(response => {
                 this.setState({
                     error: false,
@@ -61,11 +59,11 @@ export default class SearchDialog extends React.Component {
         return (
             <Dialog open={this.props.open} onClose={this.props.closeDialog}>
                 <DialogContent>
-                    {Object.keys(data).map(routeType =>
-                        <React.Fragment key={routeType}>
-                            <div className="search-section-title">{routeType}</div>
+                    {data.map(route =>
+                        <React.Fragment key={route.route_type}>
+                            <div className="search-section-title">{route.route_type}</div>
                             <div className="search-items-container">
-                                {this.routes(data[routeType])}
+                                {this.routes(route.route_names)}
                             </div>
                         </React.Fragment>
                     )}

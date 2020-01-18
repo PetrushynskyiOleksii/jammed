@@ -69,7 +69,7 @@ export default class LineTile extends React.Component {
 
         return (
             <ChartCell>
-                <ChartTitle title={`${id} / ${routeName}`} />
+                <ChartTitle title={id} routeName={routeName} />
                 <ChartLastValue value={this.getLastValue()} />
                 <LineChart width={435} height={250} data={data} >
                     <XAxis interval="preserveStartEnd" domain={["auto", "auto"]}

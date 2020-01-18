@@ -33,13 +33,13 @@ def populate_db(args):
         mongo collection.
     """
     routes = parse_routes()
-    inserted_cnt = MONGER.insert(routes, ROUTES_COLLECTION)
-    LOGGER.info(f'Successfully inserted {len(inserted_cnt)} routes.')
+    inserted_ids = MONGER.insert(routes, ROUTES_COLLECTION)
+    LOGGER.info(f'Inserted {len(inserted_ids)} routes.')
 
     static_data = parse_static_data()
     for collection_id, documents in static_data.items():
-        inserted = MONGER.insert(documents, collection_id)
-        LOGGER.info(f'Successfully inserted {len(inserted)} documents to `{collection_id}`.')
+        inserted_ids = MONGER.insert(documents, collection_id)
+        LOGGER.info(f'Inserted {len(inserted_ids)} documents to `{collection_id}`.')
 
 
 def run_collector(args):

@@ -43,7 +43,7 @@ export default class ScatterTile extends React.Component {
                 this.setState({
                     'loading': false,
                     'error': false,
-                    'data': coordinates,
+                    'data': coordinates || [],
                     'timestamp': formatTimestamp(timestamp)
                 });
             })
@@ -69,7 +69,7 @@ export default class ScatterTile extends React.Component {
 
         return (
             <ChartCell>
-                <ChartTitle title={`${id} / ${routeName}`}/>
+                <ChartTitle title={id} routeName={routeName} />
                 <ChartLastValue value={timestamp} />
                 <ScatterChart width={435} height={250}>
                     <XAxis type="number"

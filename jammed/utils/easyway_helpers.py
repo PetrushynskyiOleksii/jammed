@@ -59,11 +59,11 @@ def parse_routes():
     routes = []
     for route in routes_csv:
         route_short_name = route['route_short_name']
-        transport_type_short = re.sub(r'\d+', '', route_short_name)
-
+        route_type_short = re.sub(r'\d+', '', route_short_name)
+        route_type = TRANSPORT_TYPE_MAP.get(route_type_short, "Інші")
         routes.append({
             'id': route['route_id'],
-            'transport_type': TRANSPORT_TYPE_MAP.get(transport_type_short),
+            'transport_type': route_type,
             'short_name': route_short_name,
             'long_name': route['route_long_name'],
             'agency_id': route['agency_id'],
@@ -146,7 +146,7 @@ def parse_transport_count():
     agencies_counter = collections.Counter([route['agency_name'] for route in routes])
     agencies_count = [{"id": k, "value": v} for k, v in agencies_counter.items()]
 
-    routes_per_type = [TRANSPORT_TYPE_MAP.get(route['transport_type'], 'Інші') for route in routes]
+    routes_per_type = [route['transport_type'] for route in routes]
     transport_type_counter = collections.Counter(routes_per_type)
     transport_type_count = [{"id": k, "value": v} for k, v in transport_type_counter.items()]
 
