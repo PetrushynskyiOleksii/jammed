@@ -1,5 +1,6 @@
 """This module provides views API."""
 
+from collections import defaultdict
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request
@@ -59,7 +60,7 @@ def get_static_data_count():
 @JAMMED.route('/timeseries', methods=['GET'])
 def get_timeseries():
     """Return json response with timeseries from easyway."""
-    delta = request.args.get("delta", type=int, default=3600)
+    delta = request.args.get("delta", type=int, default=10800)
     route_name = request.args.get("route_name")
     units = request.args.get("units")
 
@@ -102,3 +103,31 @@ def get_timeseries_coordinates():
         "timestamp": document["timestamp"],
         "coordinates": coordinates
     })
+
+
+@JAMMED.route('/routes', methods=['GET'])
+def get_routes():
+    """Return json response with available routes from easyway."""
+    start, end = get_time_range(10800)
+    try:
+        documents = MONGER.find(
+            TIMESERIES_COLLECTION,
+            query_filter={
+                "timestamp": {"$gte": start, "$lte": end}
+            },
+            fields={"_id": 0, "route_name": 1, "route_type": 1},
+            order_by=[("route_name", 1)]
+        )
+    except AttributeError:
+        message = "Could not connect to database."
+        return jsonify({"error": message}), 400
+
+    response = defaultdict(list)
+    for document in list(documents):
+        route_name = document["route_name"]
+        route_type = document["route_type"]
+        if route_name and route_type:
+            if route_name not in response[route_type]:
+                response[route_type].append(route_name)
+
+    return jsonify(response)

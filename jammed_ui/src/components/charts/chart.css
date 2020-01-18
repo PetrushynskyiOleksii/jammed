@@ -35,7 +35,7 @@
 
 .chart-last-value {
     position: absolute;
-    font-size: 40px;
+    font-size: 36px;
     color: #767676;
-    opacity: 0.5;
+    opacity: 0.3;
 }

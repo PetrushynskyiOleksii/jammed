@@ -15,12 +15,6 @@ STREET_PREFIXES = ['вул. ', 'пр. ', 'просп. ', 'пл. ', 'площа '
 TRANSPORT_TYPE_MAP = {'А': 'Автобус', 'Н-А': 'Нічний Автобус', 'Т': 'Трамвай', 'Тр': 'Тролейбус'}
 
 
-def get_transport_type(route_name):
-    """Return transport type from route short name."""
-    transport_type = re.sub(r'\d+', '', route_name)
-    return transport_type if transport_type in ['А', 'Т', 'Тр'] else None
-
-
 def compile_gtfs(gtfs):
     """Compile GTFS data to dictionary format."""
     feed = gtfs_realtime_pb2.FeedMessage()
@@ -64,10 +58,13 @@ def parse_routes():
     routes_csv = load_csv(f'{EASYWAY_STATIC_DIR}/routes.txt')
     routes = []
     for route in routes_csv:
+        route_short_name = route['route_short_name']
+        transport_type_short = re.sub(r'\d+', '', route_short_name)
+
         routes.append({
             'id': route['route_id'],
-            'transport_type': get_transport_type(route['route_short_name']),
-            'short_name': route['route_short_name'],
+            'transport_type': TRANSPORT_TYPE_MAP.get(transport_type_short),
+            'short_name': route_short_name,
             'long_name': route['route_long_name'],
             'agency_id': route['agency_id'],
             'agency_name': agencies[route['agency_id']],

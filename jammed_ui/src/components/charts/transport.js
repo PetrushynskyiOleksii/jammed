@@ -1,43 +1,42 @@
 import React from "react";
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import SearchIcon from '@material-ui/icons/Search';
 
 import LineTile from "./tiles/line";
 import ScatterTile from "./tiles/scatter"
+import SearchDialog from "../search/search";
 import { ChartContainer } from "./chart";
-
-import "./search.css"
 
 
 export default class TransportCharts extends React.Component {
-    state = { open: false };
+    state = {
+        open: false,
+        routeName: localStorage.getItem("routeName")
+    };
 
     openDialog = () => {
         this.setState({ open: true })
     };
 
     closeDialog = () => {
-        this.setState({ open: false })
+        this.setState({
+            open: false,
+            routeName: localStorage.getItem("routeName"),
+        })
     };
 
     render() {
+        const { open, routeName } = this.state;
         return (
             <React.Fragment>
                 <ChartContainer>
-                    <LineTile id="trips_count" url="/timeseries" route_name="А47" />
-                    <LineTile id="avg_speed" url="/timeseries" route_name="А47" />
-                    <LineTile id="avg_distance" url="/timeseries" route_name="А47" />
-                    <ScatterTile id="coordinates" url="/timeseries/coordinates" route_name="А47"/>
+                    <LineTile id="trips_count" url="/timeseries" routeName={routeName} />
+                    <LineTile id="avg_speed" url="/timeseries" routeName={routeName} />
+                    <LineTile id="avg_distance" url="/timeseries" routeName={routeName} />
+                    <ScatterTile id="coordinates" url="/timeseries/coordinates" routeName={routeName} />
                 </ChartContainer>
                 <SearchIcon onClick={this.openDialog} className="search-button"/>
-
-                <Dialog open={this.state.open} onClose={this.closeDialog}>
-                    <DialogTitle>TODO</DialogTitle>
-                    <DialogContent>TODO</DialogContent>
-                </Dialog>
+                <SearchDialog open={open} closeDialog={this.closeDialog} routeName={routeName}/>
             </React.Fragment>
         )
     }
