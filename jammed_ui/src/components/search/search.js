@@ -3,7 +3,6 @@ import React from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 
-import { ChartError } from "../charts/chart";
 import request from "../services/request";
 
 import "./search.css"
@@ -54,10 +53,8 @@ export default class SearchDialog extends React.Component {
 
     render() {
         const { error, data } = this.state;
-        if (error) return <ChartError text="Data could not be loaded." icon="error"/>;
-
         return (
-            <Dialog open={this.props.open} onClose={this.props.closeDialog}>
+            <Dialog open={this.props.open && !error} onClose={this.props.closeDialog}>
                 <DialogContent>
                     {data.map(route =>
                         <React.Fragment key={route.route_type}>

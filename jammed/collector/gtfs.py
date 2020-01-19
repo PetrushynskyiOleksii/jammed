@@ -39,8 +39,8 @@ class GTFSCollector:
         pattern = re.compile(r"python .*manage\.py collect \d*")
         for process in psutil.process_iter(attrs=["pid", "cmdline"]):
             process_id, cmdline = process.info.values()
-            process_command = " ".join(cmdline) if type(cmdline) == list else [cmdline]
-            if pattern.search(process_command) and current_pid != process_id:
+            if type(cmdline) != list: continue
+            if pattern.search(" ".join(cmdline)) and current_pid != process_id:
                 LOGGER.warning(f'{self.name} is already exist with pid={process_id}.')
                 return True
 

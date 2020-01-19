@@ -38,13 +38,6 @@ class MongoWorker:
         """
         if cls.__instance is None:
             cls.__instance = super(MongoWorker, cls).__new__(cls)
-
-            try:
-                cls.__client.admin.command('ismaster')
-            except PyMongoError:
-                LOGGER.critical('Could not connect to MONGO.')
-                return None
-
             cls.__database = cls.__client.jammed
             cls.__collections = {
                 ROUTES_COLLECTION: cls.__database.routes,
@@ -101,25 +94,22 @@ class MongoWorker:
                 limit=limit,
                 skip=skip,
             )
+            return list(cursor)
         except (PyMongoError, AttributeError) as err:
             LOGGER.error(f'Could not find documents in collection {collection_name}'
                          f' by filter {query_filter}: {err}')
             return None
-
-        return cursor
 
     def aggregate(self, collection_name, pipeline):
         """Return aggregated data by pipeline."""
         collection = self.__collections.get(collection_name)
 
         try:
-            cursor = collection.aggregate(pipeline)
+            return collection.aggregate(pipeline)
         except (PyMongoError, AttributeError) as err:
             LOGGER.error(f'Could not aggregate data in collection {collection_name}'
                          f' by pipeline {pipeline}: {err}')
             return None
-
-        return cursor
 
     def remove(self, query_filter, collection_name):
         """Delete one or more documents matching the filter."""

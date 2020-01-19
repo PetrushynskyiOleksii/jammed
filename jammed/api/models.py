@@ -11,7 +11,7 @@ class Route:
     @staticmethod
     def coordinates(route_name):
         """Return routes coordinates in certain time period."""
-        cursor = MONGER.find(
+        result = MONGER.find(
             TIMESERIES_COLLECTION,
             query_filter={"route_name": route_name},
             fields={"_id": 0, "timestamp": 1, "route_trips": 1},
@@ -19,14 +19,7 @@ class Route:
             limit=1
         )
 
-        try:
-            response = cursor.next()
-        except StopIteration:
-            return {"timestamp": None, "route_trips": {}}
-        except AttributeError:
-            return None
-
-        return response
+        return result
 
     @staticmethod
     def available_routes():
@@ -37,16 +30,8 @@ class Route:
         group = {"$group": {"_id": "$route_type", "route_names": {"$addToSet": "$route_name"}}}
         query = [match, group]
 
-        cursor = MONGER.aggregate(TIMESERIES_COLLECTION, pipeline=query)
-        if not cursor:
-            return None
-
-        routes = []
-        for route in cursor:
-            route_names = sorted(route["route_names"])
-            routes.append({"route_type": route["_id"], "route_names": route_names})
-
-        return routes
+        result = MONGER.aggregate(TIMESERIES_COLLECTION, pipeline=query)
+        return result
 
     @staticmethod
     def timeseries(route_name, units, delta):
@@ -57,8 +42,5 @@ class Route:
         timestamp_query = {"$gte": start, "$lte": end}
         query_filter = {"route_name": route_name, "timestamp": timestamp_query}
 
-        cursor = MONGER.find(TIMESERIES_COLLECTION, query_filter, fields=fields)
-        if not cursor:
-            return None
-
-        return list(cursor)
+        result = MONGER.find(TIMESERIES_COLLECTION, query_filter, fields=fields)
+        return result
