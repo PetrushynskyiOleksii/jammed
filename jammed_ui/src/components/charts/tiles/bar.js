@@ -83,7 +83,7 @@ export default class BarTile extends React.Component {
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
                 <div onClick={this.nextPage} onContextMenu={this.prevPage}>
-                    <BarChart width={450} height={275} data={this.state.data}>
+                    <BarChart width={450} height={250} data={this.state.data}>
                         <XAxis dataKey="id" interval={0} />
                         <YAxis domain={this.yDomain()} />
                         <Bar dataKey="value" />

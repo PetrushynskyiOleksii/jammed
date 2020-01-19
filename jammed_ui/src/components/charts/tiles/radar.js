@@ -44,7 +44,7 @@ export default class RadarTile extends React.Component {
         return (
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
-                <RadarChart width={500} height={275} data={this.state.data}>
+                <RadarChart width={500} height={250} data={this.state.data}>
                     <PolarGrid />
                     <PolarRadiusAxis />
                     <PolarAngleAxis dataKey="id"/>
