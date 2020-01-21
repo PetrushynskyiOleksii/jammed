@@ -71,7 +71,7 @@ export default class ScatterTile extends React.Component {
             <ChartCell>
                 <ChartTitle title={id} routeName={routeName} />
                 <ChartLastValue value={timestamp} />
-                <ScatterChart width={435} height={250}>
+                <ScatterChart width={450} height={250}>
                     <XAxis type="number"
                            dataKey="latitude"
                            domain={['auto', 'auto']}

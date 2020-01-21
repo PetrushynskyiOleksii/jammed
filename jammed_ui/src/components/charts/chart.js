@@ -10,7 +10,7 @@ import './chart.css';
 
 export class ChartContainer extends React.Component {
     disableContextMenu = (e) => {
-        // e.preventDefault();
+        e.preventDefault();
     };
 
     render() {

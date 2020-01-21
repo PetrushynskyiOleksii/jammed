@@ -124,5 +124,16 @@ class MongoWorker:
 
         return deleted_count
 
+    def count(self, collection_name):
+        """Retrieve the count of documents in certain collection."""
+        collection = self.__collections.get(collection_name)
+
+        try:
+            count = collection.count_documents(filter={})
+            return count
+        except (PyMongoError, AttributeError) as err:
+            LOGGER.error(f'Could not count documents in collection {collection_name}: {err}')
+            return None
+
 
 MONGER = MongoWorker()

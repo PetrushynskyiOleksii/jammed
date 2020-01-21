@@ -36,11 +36,11 @@ def get_static_data():
 def get_static_data_count():
     """Return count of documents in certain collection."""
     data_id = request.args.get('id')
-    response = MONGER.find(data_id)
+    response = MONGER.count(data_id)
     if not response:
         return "Bad Request.", 400
 
-    response = jsonify({"count": len(response)})
+    response = jsonify({"count": response})
     return response
 
 
