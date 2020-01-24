@@ -9,7 +9,7 @@ from datetime import datetime
 
 from mongo.worker import MONGER
 from collector.utils import dump_route_trips
-from utils.file_helpers import download_file
+from utils.file_helpers import download_context
 from utils.easyway_helpers import compile_gtfs, parse_routes
 from settings import ROUTES_COLLECTION, TIMESERIES_COLLECTION, VEHICLE_URL
 
@@ -20,6 +20,7 @@ LOGGER = logging.getLogger('JAMMED')
 
 class GTFSCollector:
     """Daemon class that provides collecting GTFS data from EasyWay."""
+
     def __init__(self, frequency=300):
         """Initializes the new daemon instance."""
         self.pid = None
@@ -30,7 +31,7 @@ class GTFSCollector:
         self.prev_odometers = {}
 
         routes = parse_routes()
-        self.route_types = {x['id']: x['transport_type'] for x in routes}
+        self.route_types = {x['id']: x['route_type'] for x in routes}
         self.route_names = {x['id']: x['short_name'] for x in routes}
 
     def is_running(self):
@@ -87,7 +88,7 @@ class GTFSCollector:
         Defines commands to download data about Lviv transport geolocation,
         compile it to the dictionary format and insert it to the database.
         """
-        gtfs_content = download_file(VEHICLE_URL)
+        gtfs_content = download_context(VEHICLE_URL)
         if not gtfs_content:
             LOGGER.error('Failed to download file with GTFS data.')
             return False

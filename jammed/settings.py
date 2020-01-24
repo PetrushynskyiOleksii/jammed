@@ -11,6 +11,7 @@ COLLECTED_DIR = f'{ROOT_DIR}/var/collected'
 # EasyWay stuff
 EASYWAY_STATIC_DIR = f'{PROJECT_DIR}/static/ew'
 VEHICLE_URL = 'http://track.ua-gis.com/gtfs/lviv/vehicle_position'
+STATIC_URL = 'http://track.ua-gis.com/gtfs/lviv/static.zip'
 
 # Mongo stuff
 ROUTES_COLLECTION = 'routes'

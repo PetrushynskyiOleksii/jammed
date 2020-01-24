@@ -1,22 +1,26 @@
-"""This module provides functionality to work with data from EasyWay."""
+"""
+This module provides functionality to work with data from EasyWay.
+"""
 
 import re
-import json
 import collections
 
 from google import protobuf
 from google.transit import gtfs_realtime_pb2
 
-from utils.file_helpers import load_csv
 from settings import EASYWAY_STATIC_DIR
+from utils.file_helpers import load_csv
 
 
+REGIONS = ['Франківський', 'Залізничний', 'Сихівський', 'Галицький', 'Личаківський', 'Шевченківський']
 STREET_PREFIXES = ['вул. ', 'пр. ', 'просп. ', 'пл. ', 'площа ', 'вулиця ']
-TRANSPORT_TYPE_MAP = {'А': 'Автобус', 'Н-А': 'Нічний Автобус', 'Т': 'Трамвай', 'Тр': 'Тролейбус'}
+ROUTE_TYPE_MAP = {'А': 'Автобус', 'Н-А': 'Нічний Автобус', 'Т': 'Трамвай', 'Тр': 'Тролейбус'}
 
 
 def compile_gtfs(gtfs):
-    """Compile GTFS data to dictionary format."""
+    """
+    Compile GTFS data using protobuf to dictionary format.
+    """
     feed = gtfs_realtime_pb2.FeedMessage()
 
     try:
@@ -51,19 +55,22 @@ def compile_gtfs(gtfs):
 
 
 def parse_routes():
-    """Load csv file with static data about routes in Lviv."""
+    """
+    Load csv file with static data for routes in Lviv.
+    """
     agency_csv = load_csv(f'{EASYWAY_STATIC_DIR}/agency.txt')
-    agencies = {agency['agency_id']: agency['agency_name'] for agency in agency_csv}
-
     routes_csv = load_csv(f'{EASYWAY_STATIC_DIR}/routes.txt')
+
+    agencies = {agency['agency_id']: agency['agency_name'] for agency in agency_csv}
     routes = []
     for route in routes_csv:
         route_short_name = route['route_short_name']
         route_type_short = re.sub(r'\d+', '', route_short_name)
-        route_type = TRANSPORT_TYPE_MAP.get(route_type_short, "Інші")
+        route_type = ROUTE_TYPE_MAP.get(route_type_short, "Інші")
+
         routes.append({
             'id': route['route_id'],
-            'transport_type': route_type,
+            'route_type': route_type,
             'short_name': route_short_name,
             'long_name': route['route_long_name'],
             'agency_id': route['agency_id'],
@@ -75,7 +82,9 @@ def parse_routes():
 
 
 def parse_trips():
-    """Return list of trips for every route."""
+    """
+    Return list of trips for every route in Lviv..
+    """
     trips_csv = load_csv(f'{EASYWAY_STATIC_DIR}/trips.txt')
 
     trips = collections.defaultdict(set)
@@ -87,38 +96,14 @@ def parse_trips():
     return trips
 
 
-def parse_stops_per_regions():
-    """Return dict with data about number of stops per Lviv`s regions."""
-    street_prefixes_pattern = r'|'.join(STREET_PREFIXES)
-    stops_csv = load_csv(f'{EASYWAY_STATIC_DIR}/stops_clean.txt')
-
-    with open(f'{EASYWAY_STATIC_DIR}/regions.json') as file:
-        regions_map = json.load(file)
-
-    regions = dict.fromkeys(regions_map.keys(), 0)
-    for stop in stops_csv:
-        stop_name = stop['stop_desc']
-        if not stop_name:
-            continue
-
-        stop_name = re.sub(street_prefixes_pattern, '', stop_name)
-        stop_name = re.split(r'(,|\()', stop_name)[0]
-        stop_name = re.sub(r'\d+\w?', '', stop_name)
-        stop_name = stop_name.strip()
-
-        for region, streets in regions_map.items():
-            if stop_name in streets:
-                regions[region] += 1
-
-    stops_count = [{"id": k, "value": v} for k, v in regions.items()]
-    return stops_count
-
-
-def parse_stops_per_routes():
-    """Return dict with data about number of stops per routes."""
-    trips_map = {}
+def get_stops_per_routes():
+    """
+    Return dict with data about count of stops per routes.
+    """
     routes = parse_trips()
-    routes_map = get_routes_map()
+    routes_names = {route['id']: route['short_name'] for route in parse_routes()}
+
+    trips_map = {}
     for route, trips in routes.items():
         trips_map.update({trip: route for trip in trips})
 
@@ -128,10 +113,10 @@ def parse_stops_per_routes():
         trip_id = stop_time['trip_id'].split('_')[0]
         stop_id = stop_time['stop_id']
         route_id = trips_map[trip_id]
-        route_name = routes_map[route_id]
+        route_name = routes_names[route_id]
         stops.add((route_name, stop_id))
 
-    routes = dict.fromkeys(routes_map.values(), 0)
+    routes = dict.fromkeys(routes_names.values(), 0)
     for route_name, stop_id in stops:
         routes[route_name] += 1
 
@@ -139,40 +124,36 @@ def parse_stops_per_routes():
     return stops_count
 
 
-def parse_transport_count():
-    """Return transport count value per agency, transport type and certain route."""
+def get_stops_per_regions():
+    """
+    Return dict with data about count of stops per regions.
+    """
+    stops_regions_csv = load_csv(f'{EASYWAY_STATIC_DIR}/stops_regions.txt')
+    regions_counter = collections.Counter([sr['stop_region'] for sr in stops_regions_csv])
+    regions_count = [{"id": k, "value": v} for k, v in regions_counter.items()]
+    return regions_count
+
+
+def get_transport_counts():
+    """
+    Return transport count value per agency, transport type and certain route.
+    """
     routes = parse_routes()
     trips = parse_trips()
+
     agencies_counter = collections.Counter([route['agency_name'] for route in routes])
     agencies_count = [{"id": k, "value": v} for k, v in agencies_counter.items()]
 
-    routes_per_type = [route['transport_type'] for route in routes]
-    transport_type_counter = collections.Counter(routes_per_type)
-    transport_type_count = [{"id": k, "value": v} for k, v in transport_type_counter.items()]
+    routes_per_type = [route['route_type'] for route in routes]
+    route_type_counter = collections.Counter(routes_per_type)
+    route_type_count = [{"id": k, "value": v} for k, v in route_type_counter.items()]
 
-    routes_map = get_routes_map()
-    routes_count = [{"id": routes_map[route_id], "value": len(set(trips_ids))}
+    route_names = {route['id']: route['short_name'] for route in routes}
+    routes_count = [{"id": route_names[route_id], "value": len(set(trips_ids))}
                     for route_id, trips_ids in trips.items()]
 
     return {
         'transport_per_agencies': agencies_count,
-        'transport_per_type': transport_type_count,
+        'transport_per_type': route_type_count,
         'transport_per_routes': routes_count,
     }
-
-
-def parse_static_data():
-    """Return dictionary with data for graphs."""
-    static_data = {}
-    static_data.update(parse_transport_count())
-    static_data.update({'stops_per_routes': parse_stops_per_routes()})
-    static_data.update({'stops_per_regions': parse_stops_per_regions()})
-
-    return static_data
-
-
-def get_routes_map():
-    """Return dictionary with mapping routes_id - routes_name"""
-    routes_data = parse_routes()
-    routes_map = {route['id']: route['short_name'] for route in routes_data}
-    return routes_map
