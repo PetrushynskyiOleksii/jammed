@@ -1,13 +1,14 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis } from 'recharts';
 
-import request from "../../services/request";
-import { formatTimestamp } from "../../services/utils";
-import { ChartTitle, ChartLoader, ChartError, ChartCell, ChartLastValue } from "../chart";
+import request from "../services/request";
+import { getQuery } from "../services/queries";
+import { formatTimestamp } from "../services/utils";
 
+import { ChartTitle, ChartLoader, ChartError, ChartCell, ChartLastValue } from "./chart";
 import './tiles.css';
 
-const HOUR = 3600;
+const HOUR = 3600 * 1000;
 
 export default class LineTile extends React.Component {
     deltas = [HOUR, 3 * HOUR, 6 * HOUR, 12 * HOUR, 24 * HOUR];
@@ -19,10 +20,11 @@ export default class LineTile extends React.Component {
     };
 
     componentDidMount() {
-        this.queryData();
+        const { delta } = this.state;
+        this.queryData(delta);
         this.interval = setInterval(() => {
             this.setState({ loading: true });
-            this.queryData();
+            this.queryData(delta);
         }, 300 * 1000)
     };
 
@@ -30,22 +32,23 @@ export default class LineTile extends React.Component {
         clearInterval(this.interval);
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         if (prevProps.routeName !== this.props.routeName) {
-            this.queryData();
+            this.queryData(this.state.delta);
         }
     }
 
-    queryData = () => {
-        const { url, routeName, id } = this.props;
-        if (!routeName) return;
+    queryData = (delta) => {
+        const { id, url, routeName } = this.props;
+        const query = getQuery(id, { routeName, delta });
 
-        request.get(url, { route_name: routeName, units: id, delta: this.state.delta })
+        request.get(url, { query })
             .then(response => {
                 this.setState({
+                    'delta': delta,
+                    'data': response.data,
                     'loading': false,
                     'error': false,
-                    'data': response.data,
                 });
             })
             .catch(() => {
@@ -56,15 +59,15 @@ export default class LineTile extends React.Component {
     };
 
     getLastValue = () => {
-        const lastValue = this.state.data.slice(-1)[0][this.props.id];
+        const lastValue = this.state.data.slice(-1)[0].value;
         return Math.round(lastValue * 100) / 100
     };
 
     changePeriod = (e) => {
         const deltaIndex = this.deltas.indexOf(this.state.delta);
-        const newDeltaIndex = e.type === "click" ? deltaIndex + 1 : deltaIndex - 1;
+        const newDeltaIndex = e.type === "click" ? deltaIndex - 1 : deltaIndex + 1;
         const delta = this.deltas[newDeltaIndex];
-        if (delta) this.setState({ delta }, this.queryData);
+        if (delta) this.queryData(delta);
     };
 
     render() {
@@ -72,9 +75,9 @@ export default class LineTile extends React.Component {
         const { id, routeName } = this.props;
 
         if (!routeName) return <ChartError text="No route chosen." icon="empty"/>;
-        if (error) return <ChartError text="Data could not be loaded." icon="error"/>;
-        if (loading) return <ChartLoader text="Loading data..." />;
-        if (!data.length) return <ChartError text="No data points." icon="warning"/>;
+        else if (error) return <ChartError text="Data could not be loaded." icon="error"/>;
+        else if (loading) return <ChartLoader text="Loading data..." />;
+        else if (!data.length) return <ChartError text="No data points." icon="warning"/>;
 
         return (
             <ChartCell>
@@ -93,7 +96,7 @@ export default class LineTile extends React.Component {
                           stroke="#d3864d"
                           type="monotone"
                           dot={false}
-                          dataKey={id}
+                          dataKey="value"
                     />
                 </LineChart>
                 </div>

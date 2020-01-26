@@ -1,4 +1,6 @@
-"""This module provides project settings."""
+"""
+This module provides project settings and constants.
+"""
 
 import os
 
@@ -14,10 +16,7 @@ VEHICLE_URL = 'http://track.ua-gis.com/gtfs/lviv/vehicle_position'
 STATIC_URL = 'http://track.ua-gis.com/gtfs/lviv/static.zip'
 
 # Mongo stuff
-ROUTES_COLLECTION = 'routes'
 TIMESERIES_COLLECTION = 'timeseries'
-STATIC_GRAPHS_COLLECTION = 'static_graphs'
-JAMMED_COLLECTION = 'jammed'
 TRANSPORT_PER_AGENCIES = 'transport_per_agencies'
 TRANSPORT_PER_TYPE = 'transport_per_type'
 TRANSPORT_PER_ROUTES = 'transport_per_routes'

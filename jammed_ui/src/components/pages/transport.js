@@ -2,10 +2,10 @@ import React from "react";
 
 import SearchIcon from '@material-ui/icons/Search';
 
-import LineTile from "./tiles/line";
-import ScatterTile from "./tiles/scatter"
+import LineTile from "../tiles/line";
+import ScatterTile from "../tiles/scatter"
 import SearchDialog from "../search/search";
-import { ChartContainer } from "./chart";
+import { ChartContainer } from "../tiles/chart";
 
 
 export default class TransportCharts extends React.Component {
@@ -33,7 +33,7 @@ export default class TransportCharts extends React.Component {
                     <LineTile id="trips_count" url="/timeseries" routeName={routeName} />
                     <LineTile id="avg_speed" url="/timeseries" routeName={routeName} />
                     <LineTile id="avg_distance" url="/timeseries" routeName={routeName} />
-                    <ScatterTile id="coordinates" url="/timeseries/coordinates" routeName={routeName} />
+                    <ScatterTile id="coordinates" url="/timeseries" routeName={routeName} />
                 </ChartContainer>
                 <SearchIcon onClick={this.openDialog} className="search-button"/>
                 <SearchDialog open={open} closeDialog={this.closeDialog} routeName={routeName}/>

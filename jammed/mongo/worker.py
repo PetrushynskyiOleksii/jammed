@@ -6,9 +6,7 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 from settings import (
-    ROUTES_COLLECTION,
     TIMESERIES_COLLECTION,
-    JAMMED_COLLECTION,
     TRANSPORT_PER_AGENCIES,
     TRANSPORT_PER_TYPE,
     TRANSPORT_PER_ROUTES,
@@ -40,9 +38,7 @@ class MongoWorker:
             cls.__instance = super(MongoWorker, cls).__new__(cls)
             cls.__database = cls.__client.jammed
             cls.__collections = {
-                ROUTES_COLLECTION: cls.__database.routes,
                 TIMESERIES_COLLECTION: cls.__database.timeseries,
-                JAMMED_COLLECTION: cls.__database.jammed,
                 TRANSPORT_PER_AGENCIES: cls.__database.transport_per_agencies,
                 TRANSPORT_PER_TYPE: cls.__database.transport_per_type,
                 TRANSPORT_PER_ROUTES: cls.__database.transport_per_routes,

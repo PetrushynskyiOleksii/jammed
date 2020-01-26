@@ -8,10 +8,10 @@ import logging
 from datetime import datetime
 
 from mongo.worker import MONGER
-from collector.utils import dump_route_trips
-from utils.file_helpers import download_context
+from api.route import get_routes_by_date
+from utils.file_helpers import download_context, dump_csv
 from utils.easyway_helpers import compile_gtfs, parse_routes
-from settings import ROUTES_COLLECTION, TIMESERIES_COLLECTION, VEHICLE_URL
+from settings import TIMESERIES_COLLECTION, VEHICLE_URL, COLLECTED_DIR
 
 
 DEFAULT_SLEEP_TIME = 10
@@ -19,23 +19,27 @@ LOGGER = logging.getLogger('JAMMED')
 
 
 class GTFSCollector:
-    """Daemon class that provides collecting GTFS data from EasyWay."""
+    """
+    Daemon class that provides collecting GTFS data from EasyWay.
+    """
 
-    def __init__(self, frequency=300):
-        """Initializes the new daemon instance."""
+    def __init__(self):
+        """
+        Initializes the new daemon instance with default parameters.
+        """
         self.pid = None
         self.name = 'GTFSCollector'
         self.collect_date = datetime.now()
-        self.frequency = frequency
+        self.frequency = 300
         self.attempts = 1
         self.prev_odometers = {}
-
-        routes = parse_routes()
-        self.route_types = {x['id']: x['route_type'] for x in routes}
-        self.route_names = {x['id']: x['short_name'] for x in routes}
+        self.routes_infos = {x['id']: x for x in parse_routes()}
 
     def is_running(self):
-        """Check if daemon is already running."""
+        """
+        Check if daemon is already running.
+        """
+        # TODO: improve look up
         current_pid = os.getpid()
         pattern = re.compile(r"python .*manage\.py collect \d*")
         for process in psutil.process_iter(attrs=["pid", "cmdline"]):
@@ -48,7 +52,9 @@ class GTFSCollector:
         return False
 
     def run(self):
-        """Implements permanent repetition for the execution of certain commands."""
+        """
+        Provides permanent repetition for the execution of specified commands.
+        """
         if self.is_running():
             return
 
@@ -62,16 +68,19 @@ class GTFSCollector:
             self.pid = None
 
     def repeat(self):
-        """Define commands to repeat every frequency."""
+        """
+        Define commands to repeat its per frequency.
+        """
         while True:
             current_date = datetime.now()
             if self.collect_date.day != current_date.day:
-                filename = self.collect_date.strftime('%Y%m%d')
-                dumped = dump_route_trips(filename)
+                collected_routes = get_routes_by_date(self.collect_date)
+                filename = f'{self.collect_date.strftime("%Y%m%d")}.json'
+                dumped = dump_csv(f'{COLLECTED_DIR}/{filename}', collected_routes)
                 if not dumped:
-                    LOGGER.error(f"Could not dump trips to `{filename}.json`")
+                    LOGGER.error(f"Could not dump trips to `{filename}`")
 
-                LOGGER.info(f'Dumped documents to `{filename}.json`')
+                LOGGER.info(f'Dumped route trips to `{filename}`')
                 self.collect_date = current_date
 
             executed = self.collect()
@@ -98,50 +107,38 @@ class GTFSCollector:
             LOGGER.error('Failed to compile GTFS data to json format.')
             return False
 
-        graphs_data = []
+        routes = []
         timestamp = int(time.time())
         for route_id, trips in gtfs_dict.items():
-            MONGER.update(
-                query_filter={'id': route_id},
-                modifications={'$push': {'trips': {'$each': trips}}},
-                collection_name=ROUTES_COLLECTION
-            )
-            route_speeds = [trip['speed'] for trip in trips]
-            route_avg_speed = sum(route_speeds) / len(route_speeds)
-
-            route_trips = {}
+            route_info = self.routes_infos.get(route_id, {})
             for trip in trips:
-                vehicle_id = trip["vehicle_id"]
-                curr_odometer = trip["odometer"]
+                vehicle_id = trip['vehicle_id']
+                curr_odometer = trip['odometer']
                 prev_odometer = self.prev_odometers.get(vehicle_id, curr_odometer)
                 self.prev_odometers[vehicle_id] = curr_odometer
 
-                route_trips[trip["license_plate"]] = {
-                    "coordinates": {
-                        "latitude": trip['latitude'],
-                        "longitude": trip['longitude']
-                    },
-                    "speed": trip["speed"],
-                    "odometer": curr_odometer,
-                    "distance": curr_odometer - prev_odometer
-                }
+                routes.append({
+                    'route_id': route_id,
+                    'route_short_name': route_info.get('short_name'),
+                    'route_long_name': route_info.get('long_name'),
+                    'route_type': route_info.get('route_type'),
 
-            route_distances = [x["distance"] for x in route_trips.values()]
-            route_avg_distance = sum(route_distances) / len(route_distances)
+                    'agency_name': route_info.get('agency_name'),
+                    'agency_id': route_info.get('agency_id'),
 
-            graphs_data.append({
-                'route_id': route_id,
-                'route_name': self.route_names.get(route_id),
-                'route_type': self.route_types.get(route_id, "Інші"),
-                'avg_speed': route_avg_speed,
-                'avg_distance': route_avg_distance,
-                'trips_count': len(trips),
-                'route_trips': route_trips,
-                'timestamp': timestamp
-            })
+                    'trip_latitude': trip.get('latitude'),
+                    'trip_longitude': trip.get('longitude'),
+                    'trip_vehicle_id': trip.get('vehicle_id'),
+                    'trip_bearing': trip.get('bearing'),
+                    'trip_speed': trip.get('speed'),
+                    'trip_odometer': curr_odometer,
+                    'trip_distance': curr_odometer - prev_odometer,
 
-        inserted_ids = MONGER.insert(graphs_data, TIMESERIES_COLLECTION)
-        LOGGER.info(f'Successfully pushed {len(inserted_ids)} routes.')
+                    'timestamp': timestamp
+                })
+
+        inserted_ids = MONGER.insert(routes, TIMESERIES_COLLECTION)
+        LOGGER.info(f'Successfully pushed {len(inserted_ids)} trips.')
         return True
 
 

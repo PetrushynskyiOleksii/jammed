@@ -3,17 +3,18 @@ import {
     RadarChart, PolarGrid, PolarRadiusAxis, PolarAngleAxis, Radar
 } from 'recharts';
 
-import request from "../../services/request";
-import { ChartTitle, ChartLoader, ChartError, ChartCell } from "../chart";
+import request from "../services/request";
+import { ChartTitle, ChartLoader, ChartError, ChartCell } from "./chart";
 
 import './tiles.css';
 
 
 export default class RadarTile extends React.Component {
+
     state = {
+        data: [],
         loading: true,
-        error: false,
-        data: []
+        error: false
     };
 
     componentDidMount() {
@@ -22,12 +23,13 @@ export default class RadarTile extends React.Component {
 
     queryData = () => {
         const { url, id } = this.props;
+
         request.get(url, { id })
             .then(response => {
                 this.setState({
+                    'data': response.data,
                     'loading': false,
-                    'error': false,
-                    'data': response.data
+                    'error': false
                 });
             })
             .catch(() => {
@@ -39,7 +41,7 @@ export default class RadarTile extends React.Component {
 
     render() {
         if (this.state.error) return <ChartError text="Data could not be loaded." icon="error"/>;
-        if (this.state.loading) return <ChartLoader text="Loading data..." />;
+        else if (this.state.loading) return <ChartLoader text="Loading data..." />;
 
         return (
             <ChartCell>

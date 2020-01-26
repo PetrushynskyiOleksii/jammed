@@ -1,9 +1,13 @@
-"""This module provides views API."""
+"""
+This module provides API views.
+"""
+
+import json
 
 from flask import Blueprint, jsonify, request
 
-from api.models import Route
 from mongo.worker import MONGER
+from settings import TIMESERIES_COLLECTION
 
 
 JAMMED = Blueprint('jammed', __name__)
@@ -11,7 +15,9 @@ JAMMED = Blueprint('jammed', __name__)
 
 @JAMMED.route('/static', methods=['GET'])
 def get_static_data():
-    """Return json response with static data from easyway."""
+    """
+    Return json response with static data from easyway by data id.
+    """
     collection_id = request.args.get('id')
     data_limit = request.args.get('limit', type=int, default=0)
     data_skip = request.args.get('skip', type=int, default=0)
@@ -34,7 +40,9 @@ def get_static_data():
 
 @JAMMED.route('/static/count', methods=['GET'])
 def get_static_data_count():
-    """Return count of documents in certain collection."""
+    """
+    Return count of documents in certain collection.
+    """
     data_id = request.args.get('id')
     response = MONGER.count(data_id)
     if not response:
@@ -44,42 +52,13 @@ def get_static_data_count():
     return response
 
 
-@JAMMED.route('/timeseries', methods=['GET'])
-def get_timeseries():
-    """Return json response with timeseries from easyway."""
-    delta = request.args.get("delta", type=int, default=10800)
-    route_name = request.args.get("route_name")
-    units = request.args.get("units")
-
-    response = Route.timeseries(route_name, units, delta)
-    if response is None:
-        return "Bad Request.", 400
-
-    return jsonify(response)
-
-
-@JAMMED.route('/timeseries/coordinates', methods=['GET'])
-def get_coordinates():
-    """Return coordinates for certain route from timeseries collection."""
-    route_name = request.args.get("route_name")
-    response = Route.coordinates(route_name)
-    if response is None:
-        return "Bad Request.", 400
-
-    try:
-        response = response[0]
-    except IndexError:
-        return jsonify({"timestamp": None, "coordinates": []})
-
-    coordinates = [x["coordinates"] for x in response["route_trips"].values()]
-    timestamp = response["timestamp"]
-    return jsonify({"timestamp": timestamp, "coordinates": coordinates})
-
-
-@JAMMED.route('/routes', methods=['GET'])
-def get_routes():
-    """Return json response with available routes from easyway."""
-    cursor = Route.available_routes()
+@JAMMED.route('/available_routes', methods=['GET'])
+def get_available_routes():
+    """
+    Return json response with available routes from easyway for last period.
+    """
+    query = json.loads(request.args.get("query"))
+    cursor = MONGER.aggregate(TIMESERIES_COLLECTION, pipeline=query)
     if cursor is None:
         return "Bad Request.", 400
 
@@ -89,4 +68,18 @@ def get_routes():
         routes.append({"route_type": route["_id"], "route_names": route_names})
 
     response = sorted(routes, key=lambda x: -len(x["route_names"]))
+    return jsonify(response)
+
+
+@JAMMED.route('/timeseries', methods=['GET'])
+def get_timeseries():
+    """
+    Return json response with timeseries from easyway by aggregation query.
+    """
+    query = json.loads(request.args.get("query"))
+    cursor = MONGER.aggregate(TIMESERIES_COLLECTION, pipeline=query)
+    if cursor is None:
+        return "Bad Request.", 400
+
+    response = [{"timestamp": x["_id"]["timestamp"], "value": x["value"]} for x in cursor]
     return jsonify(response)

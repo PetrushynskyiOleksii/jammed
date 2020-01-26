@@ -6,11 +6,8 @@ const apiVersion = '/api/v1';
 
 function get(url, params){
     url = host + apiVersion + url;
-    const response = axios.get(url, { params });
-    // TODO: implement handler for errors
-
-    return response
+    return axios.get(url, { params });
 }
 
 
-export default {get};
+export default { get };

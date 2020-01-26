@@ -12,14 +12,13 @@ from flask_script import Manager
 from api.views import JAMMED
 from mongo.worker import MONGER
 from collector.gtfs import GTFS_COLLECTOR
-from settings import ROUTES_COLLECTION, EASYWAY_STATIC_DIR, STATIC_URL, ROOT_DIR
+from settings import EASYWAY_STATIC_DIR, STATIC_URL, ROOT_DIR
 from utils.geo_helpers import geo_reverse
 from utils.file_helpers import download_context, dump_csv, load_csv, unzip
 from utils.easyway_helpers import (
     get_transport_counts,
     get_stops_per_routes,
     get_stops_per_regions,
-    parse_routes,
     REGIONS)
 
 
@@ -95,16 +94,6 @@ def prepare_regions():
 
     dump_csv(f'{EASYWAY_STATIC_DIR}/stops_regions.txt', list(new_stops.values()))
     LOGGER.info(f'Region was added to {len(new_stops.keys()) - len(existing_stops.keys())} stops.')
-
-
-@manager.command
-def populate_routes():
-    """
-    Load static data for routes in Lviv to `routes` collection.
-    """
-    routes = parse_routes()
-    inserted_ids = MONGER.insert(routes, ROUTES_COLLECTION)
-    LOGGER.info(f'Inserted {len(inserted_ids)} routes.')
 
 
 @manager.command

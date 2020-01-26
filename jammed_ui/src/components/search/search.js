@@ -3,12 +3,14 @@ import React from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 
+import { getQuery } from "../services/queries";
 import request from "../services/request";
 
 import "./search.css"
 
 
 export default class SearchDialog extends React.Component {
+    delta = 10800 * 1000;  // 3 hours
     state = {
         data: [],
         error: false,
@@ -19,7 +21,8 @@ export default class SearchDialog extends React.Component {
     }
 
     queryData = () => {
-        request.get("/routes")
+        const query = getQuery("available_routes", { delta: this.delta });
+        request.get("/available_routes", { query })
             .then(response => {
                 this.setState({
                     error: false,
@@ -35,7 +38,7 @@ export default class SearchDialog extends React.Component {
 
     setRouteName = (name) => {
         localStorage.setItem("routeName", name);
-        this.props.closeDialog(name);
+        this.props.closeDialog();
     };
 
     activeRoute(name) {

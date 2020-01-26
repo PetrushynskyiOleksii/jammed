@@ -1,8 +1,8 @@
 import React from "react";
 
-import RadarTile from "./tiles/radar";
-import BarTile from "./tiles/bar";
-import { ChartContainer } from "./chart";
+import RadarTile from "../tiles/radar";
+import BarTile from "../tiles/bar";
+import { ChartContainer } from "../tiles/chart";
 
 
 export default class StaticCharts extends React.Component {

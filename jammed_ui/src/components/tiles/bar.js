@@ -1,8 +1,8 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 
-import request from "../../services/request";
-import { ChartTitle, ChartLoader, ChartError, ChartCell } from "../chart";
+import request from "../services/request";
+import { ChartTitle, ChartLoader, ChartError, ChartCell } from "./chart";
 
 import './tiles.css';
 
@@ -10,17 +10,17 @@ import './tiles.css';
 export default class BarTile extends React.Component {
     state = {
         data: [],
-        loading: true,
-        error: false,
         limit: 10,
         skip: 0,
         count: 0,
         max: 0,
+        loading: true,
+        error: false,
     };
 
     componentDidMount() {
         this.queryCount();
-        this.queryData();
+        this.queryData(0);
     }
 
     yDomain() {
@@ -37,17 +37,19 @@ export default class BarTile extends React.Component {
             })
     };
 
-    queryData = () => {
+    queryData = (skip) => {
         const { url, id } = this.props;
-        const { skip, limit, max } = this.state;
+        const { limit, max } = this.state;
+
         request.get(url, { id, limit, skip })
             .then(response => {
                 const { data } = response;
                 this.setState({
-                    'loading': false,
-                    'error': false,
+                    'skip': skip,
                     'data': data,
-                    'max': skip ? max: Math.ceil(data[0].value / 10) * 10
+                    'max': skip ? max: Math.ceil(data[0].value / 10) * 10,
+                    'loading': false,
+                    'error': false
                 });
             })
             .catch(() => {
@@ -60,24 +62,20 @@ export default class BarTile extends React.Component {
     nextPage = () => {
         const { limit, skip, count } = this.state;
         if (skip + limit < count) {
-            this.setState({
-                skip: skip + limit
-            }, this.queryData);
+            this.queryData(skip + limit);
         }
     };
 
     prevPage = () => {
         const { limit, skip } = this.state;
         if (skip > 0) {
-            this.setState({
-                skip: Math.max(skip - limit, 0)
-            }, this.queryData);
+            this.queryData(Math.max(skip - limit, 0))
         }
     };
 
     render() {
         if (this.state.error) return <ChartError text="Data could not be loaded." icon="error"/>;
-        if (this.state.loading) return <ChartLoader text="Loading data..." />;
+        else if (this.state.loading) return <ChartLoader text="Loading data..." />;
 
         return (
             <ChartCell>

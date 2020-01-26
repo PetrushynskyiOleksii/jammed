@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import BarChartOutlinedIcon from '@material-ui/icons/BarChartOutlined';
 
-import './main.css';
+import './navigation.css';
 
 
 class NavigationButton extends React.Component {
+
     isActive = () => {
         const { active, label } = this.props;
         return active === label ? " nav-button-active": ""
