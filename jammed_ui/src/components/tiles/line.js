@@ -1,9 +1,9 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis } from 'recharts';
 
-import request from "../services/request";
-import { getQuery } from "../services/queries";
-import { formatTimestamp } from "../services/utils";
+import request from "../../services/request";
+import { getQuery } from "../../services/queries";
+import { formatTimestamp } from "../../services/utils";
 
 import { ChartTitle, ChartLoader, ChartError, ChartCell, ChartLastValue } from "./chart";
 import './tiles.css';
@@ -74,10 +74,10 @@ export default class LineTile extends React.Component {
         const { error, loading, data } = this.state;
         const { id, routeName } = this.props;
 
-        if (!routeName) return <ChartError text="No route chosen." icon="empty"/>;
-        else if (error) return <ChartError text="Data could not be loaded." icon="error"/>;
-        else if (loading) return <ChartLoader text="Loading data..." />;
-        else if (!data.length) return <ChartError text="No data points." icon="warning"/>;
+        if (!routeName) return <ChartCell><ChartError text="No route chosen." icon="empty"/></ChartCell>;
+        else if (error) return <ChartCell><ChartError text="Data could not be loaded." icon="error"/></ChartCell>;
+        else if (loading) return <ChartCell><ChartLoader text="Loading data..." /></ChartCell>;
+        else if (!data.length) return <ChartCell><ChartError text="No data points." icon="warning"/></ChartCell>;
 
         return (
             <ChartCell>

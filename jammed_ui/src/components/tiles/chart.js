@@ -52,14 +52,14 @@ export class ChartCell extends React.Component {
 export class ChartLoader extends React.Component {
     render() {
         return (
-            <ChartCell>
+            <React.Fragment>
                 <div className="chart-text">{this.props.text}</div>
                 <Loader
                     type="ThreeDots"
                     color="#767676"
                     height={30}
                 />
-            </ChartCell>
+            </React.Fragment>
         )
     }
 }
@@ -73,10 +73,10 @@ export class ChartError extends React.Component{
     render() {
         const { icon, text } = this.props
         return (
-            <ChartCell>
+            <React.Fragment>
                 <div className="chart-text">{text}</div>
                 {this.icons[icon]}
-            </ChartCell>
+            </React.Fragment>
         )
     }
 }

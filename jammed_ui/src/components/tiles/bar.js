@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 
-import request from "../services/request";
+import request from "../../services/request";
 import { ChartTitle, ChartLoader, ChartError, ChartCell } from "./chart";
 
 import './tiles.css';
@@ -74,14 +74,15 @@ export default class BarTile extends React.Component {
     };
 
     render() {
-        if (this.state.error) return <ChartError text="Data could not be loaded." icon="error"/>;
-        else if (this.state.loading) return <ChartLoader text="Loading data..." />;
+        const { error, loading, data } = this.state;
+        if (error) return <ChartCell><ChartError text="Data could not be loaded." icon="error"/></ChartCell>;
+        else if (loading) return <ChartCell><ChartLoader text="Loading data..." /></ChartCell>;
 
         return (
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
                 <div onClick={this.nextPage} onContextMenu={this.prevPage}>
-                    <BarChart width={450} height={250} data={this.state.data}>
+                    <BarChart width={450} height={250} data={data}>
                         <XAxis dataKey="id" interval={0} />
                         <YAxis domain={this.yDomain()} />
                         <Bar dataKey="value" />

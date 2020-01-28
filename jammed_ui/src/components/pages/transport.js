@@ -5,13 +5,38 @@ import SearchIcon from '@material-ui/icons/Search';
 import LineTile from "../tiles/line";
 import ScatterTile from "../tiles/scatter"
 import SearchDialog from "../search/search";
+import request from "../../services/request";
 import { ChartContainer } from "../tiles/chart";
+import { getQuery } from "../../services/queries";
 
 
 export default class TransportCharts extends React.Component {
+    delta = 10800 * 1000;  // 3 hours
+
     state = {
         open: false,
-        routeName: localStorage.getItem("routeName")
+        routeName: localStorage.getItem("routeName"),
+        available_routes: []
+    };
+
+    componentDidMount() {
+        this.queryData()
+    }
+
+    queryData = () => {
+        const query = getQuery("available_routes", { delta: this.delta });
+        request.get("/available_routes", { query })
+            .then(response => {
+                this.setState({
+                    error: false,
+                    available_routes: response.data
+                });
+            })
+            .catch(() => {
+                this.setState({
+                    error: true
+                });
+            })
     };
 
     openDialog = () => {
@@ -26,7 +51,7 @@ export default class TransportCharts extends React.Component {
     };
 
     render() {
-        const { open, routeName } = this.state;
+        const { open, routeName, available_routes } = this.state;
         return (
             <React.Fragment>
                 <ChartContainer>
@@ -35,8 +60,12 @@ export default class TransportCharts extends React.Component {
                     <LineTile id="avg_distance" url="/timeseries" routeName={routeName} />
                     <ScatterTile id="coordinates" url="/timeseries" routeName={routeName} />
                 </ChartContainer>
-                <SearchIcon onClick={this.openDialog} className="search-button"/>
-                <SearchDialog open={open} closeDialog={this.closeDialog} routeName={routeName}/>
+                {available_routes.length && <SearchIcon onClick={this.openDialog} className="search-button"/>}
+                <SearchDialog open={open}
+                              closeDialog={this.closeDialog}
+                              routeName={routeName}
+                              data={available_routes}
+                />
             </React.Fragment>
         )
     }

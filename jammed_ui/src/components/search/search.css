@@ -13,12 +13,13 @@
 .MuiPaper-root {
     padding: 0 0 30px 30px;
     background-color: #191919 !important;
+    width: 500px;
+    min-height: 100px;
 }
 
 .search-items-container {
     display: flex;
     flex-wrap: wrap;
-    width: 500px;
 }
 
 .search-section-title {

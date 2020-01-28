@@ -3,38 +3,10 @@ import React from "react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 
-import { getQuery } from "../services/queries";
-import request from "../services/request";
-
 import "./search.css"
 
 
 export default class SearchDialog extends React.Component {
-    delta = 10800 * 1000;  // 3 hours
-    state = {
-        data: [],
-        error: false,
-    };
-
-    componentDidMount() {
-        this.queryData()
-    }
-
-    queryData = () => {
-        const query = getQuery("available_routes", { delta: this.delta });
-        request.get("/available_routes", { query })
-            .then(response => {
-                this.setState({
-                    error: false,
-                    data: response.data
-                });
-            })
-            .catch(() => {
-                this.setState({
-                    error: true
-                });
-            })
-    };
 
     setRouteName = (name) => {
         localStorage.setItem("routeName", name);
@@ -55,10 +27,10 @@ export default class SearchDialog extends React.Component {
     }
 
     render() {
-        const { error, data } = this.state;
+        const { data, open, closeDialog } = this.props;
         return (
-            <Dialog open={this.props.open && !error} onClose={this.props.closeDialog}>
-                <DialogContent>
+            <Dialog open={open} onClose={closeDialog}>
+                <DialogContent >
                     {data.map(route =>
                         <React.Fragment key={route.route_type}>
                             <div className="search-section-title">{route.route_type}</div>
