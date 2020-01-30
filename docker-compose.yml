@@ -4,14 +4,41 @@ services:
   mongodb:
     container_name: jammed_mongodb
     image: mongo
+    volumes:
+      - mongo-data:/data/db
     ports:
       - 27017:27017
 
-  app:
-    container_name: jammed_app
-    build: .
-    command: bash -c "python jammed/manage.py populate && python jammed/git stmanage.py collect 300"
+  collector:
+    container_name: jammed_collector
+    build: ./jammed
+    command: bash -c "cron && python manage.py collect -f 300"
     volumes:
+      - collected-data:/var/collected
       - .:/jammed
     depends_on:
       - mongodb
+
+  api:
+    container_name: jammed_api
+    build: ./jammed
+    command: python manage.py runserver -d
+    volumes:
+      - .:/jammed
+    ports:
+      - 5000:5000
+
+  ui:
+    container_name: jammed_ui
+    build: ./jammed_ui
+    command: npm start
+    volumes:
+      - .:/jammed
+      - node-modules:/jammed/jammed_ui/node_modules
+    ports:
+      - 3000:3000
+
+volumes:
+  node-modules:
+  mongo-data:
+  collected-data:

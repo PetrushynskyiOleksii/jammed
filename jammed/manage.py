@@ -12,7 +12,7 @@ from flask_script import Manager
 from api.views import JAMMED
 from mongo.worker import MONGER
 from collector.gtfs import GTFS_COLLECTOR
-from settings import EASYWAY_STATIC_DIR, STATIC_URL, ROOT_DIR
+from settings import EASYWAY_STATIC_DIR, STATIC_URL, LOG_DIR
 from utils.geo_helpers import geo_reverse
 from utils.file_helpers import download_context, dump_csv, load_csv, unzip
 from utils.easyway_helpers import (
@@ -29,7 +29,7 @@ LOGGER = logging.getLogger('JAMMED')
 LOGGER.setLevel(logging.DEBUG)
 
 c_handler = logging.StreamHandler()
-f_handler = logging.FileHandler(f'{ROOT_DIR}/var/logs/jammed.log')
+f_handler = logging.FileHandler(f'/var/log/jammed.log')
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 c_handler.setFormatter(formatter)
@@ -51,7 +51,7 @@ def runserver(debug=False):
     app.register_blueprint(JAMMED, url_prefix='/api/v1/')
     LOGGER.info('Flask endpoints was instantiated.')
 
-    app.run(debug=debug)
+    app.run(debug=debug, host="0.0.0.0", port=5000)
 
 
 @manager.command

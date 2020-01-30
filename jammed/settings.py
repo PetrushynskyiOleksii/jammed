@@ -8,7 +8,8 @@ import os
 # Project stuff
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = PROJECT_DIR[:PROJECT_DIR.rindex('/')]
-COLLECTED_DIR = f'{ROOT_DIR}/var/collected'
+COLLECTED_DIR = '/var/collected'
+LOG_DIR = '/var/log'
 
 # EasyWay stuff
 EASYWAY_STATIC_DIR = f'{PROJECT_DIR}/static/ew'

@@ -1,0 +1,6 @@
+@reboot /usr/local/bin/python /jammed/jammed/manage.py prepare_static
+@reboot /usr/local/bin/python /jammed/jammed/manage.py prepare_regions
+@reboot /usr/local/bin/python /jammed/jammed/manage.py populate_counts
+0 3 * * * /usr/local/bin/python /jammed/jammed/manage.py prepare_static
+0 3 * * * /usr/local/bin/python /jammed/jammed/manage.py prepare_regions
+0 3 * * * /usr/local/bin/python /jammed/jammed/manage.py populate_counts

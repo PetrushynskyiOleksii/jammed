@@ -16,8 +16,8 @@ from settings import (
 
 __all__ = ['MONGER']
 
-# MONGO_HOST = 'mongodb://mongodb:27017'
-MONGO_HOST = 'localhost:27017'
+MONGO_HOST = 'mongodb://mongodb:27017'
+# MONGO_HOST = 'localhost:27017'
 
 MONGO_SERVER_TIMEOUT = 5 * 1000
 LOGGER = logging.getLogger('JAMMED')
