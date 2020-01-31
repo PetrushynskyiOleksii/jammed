@@ -7,7 +7,31 @@ import { formatTimestamp } from "../../services/utils";
 import { ChartTitle, ChartLoader, ChartError, ChartCell, ChartLastValue } from "./chart";
 
 
-export default class ScatterTile extends React.Component {
+class ScatterTile extends React.PureComponent {
+
+    formatTicks = (tick) => {
+        return tick.toFixed(3);
+    };
+
+    render() {
+        return (
+            <ScatterChart width={450} height={250}>
+                <XAxis type="number"
+                       dataKey="latitude"
+                       domain={['auto', 'auto']}
+                       tickFormatter={this.formatTicks}
+                />
+                <YAxis domain={['auto', 'auto']}
+                       dataKey="longitude"
+                       tickFormatter={this.formatTicks}
+                />
+                <Scatter data={this.props.data} />
+            </ScatterChart>
+        )
+    }
+}
+
+export default class ScatterContainer extends React.Component {
 
     state = {
         data: [],
@@ -55,10 +79,6 @@ export default class ScatterTile extends React.Component {
             })
     };
 
-    formatTicks = (tick) => {
-        return tick.toFixed(3);
-    };
-
     render() {
         const { error, loading, data, timestamp } = this.state;
         const { id, routeName } = this.props;
@@ -72,18 +92,7 @@ export default class ScatterTile extends React.Component {
             <ChartCell>
                 <ChartTitle title={id} routeName={routeName} />
                 <ChartLastValue value={timestamp} />
-                <ScatterChart width={450} height={250}>
-                    <XAxis type="number"
-                           dataKey="latitude"
-                           domain={['auto', 'auto']}
-                           tickFormatter={this.formatTicks}
-                    />
-                    <YAxis domain={['auto', 'auto']}
-                           dataKey="longitude"
-                           tickFormatter={this.formatTicks}
-                    />
-                    <Scatter data={data} />
-                </ScatterChart>
+                <ScatterTile data={data} />
             </ChartCell>
         );
     }

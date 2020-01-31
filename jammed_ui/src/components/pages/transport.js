@@ -2,8 +2,8 @@ import React from "react";
 
 import SearchIcon from '@material-ui/icons/Search';
 
-import LineTile from "../tiles/line";
-import ScatterTile from "../tiles/scatter"
+import LineContainer from "../tiles/line";
+import ScatterContainer from "../tiles/scatter"
 import SearchDialog from "../search/search";
 import request from "../../services/request";
 import { ChartContainer } from "../tiles/chart";
@@ -15,7 +15,7 @@ export default class TransportCharts extends React.Component {
 
     state = {
         open: false,
-        routeName: localStorage.getItem("routeName"),
+        routeName: null,
         available_routes: []
     };
 
@@ -29,6 +29,7 @@ export default class TransportCharts extends React.Component {
             .then(response => {
                 this.setState({
                     error: false,
+                    routeName: localStorage.getItem("routeName"),
                     available_routes: response.data
                 });
             })
@@ -40,7 +41,9 @@ export default class TransportCharts extends React.Component {
     };
 
     openDialog = () => {
-        this.setState({ open: true })
+        this.setState({
+            open: true
+        })
     };
 
     closeDialog = () => {
@@ -55,16 +58,16 @@ export default class TransportCharts extends React.Component {
         return (
             <React.Fragment>
                 <ChartContainer>
-                    <LineTile id="trips_count" url="/timeseries" routeName={routeName} />
-                    <LineTile id="avg_speed" url="/timeseries" routeName={routeName} />
-                    <LineTile id="avg_distance" url="/timeseries" routeName={routeName} />
-                    <ScatterTile id="coordinates" url="/timeseries" routeName={routeName} />
+                    <LineContainer id="trips_count" url="/timeseries" routeName={routeName} />
+                    <LineContainer id="avg_speed" url="/timeseries" routeName={routeName} />
+                    <LineContainer id="avg_distance" url="/timeseries" routeName={routeName} />
+                    <ScatterContainer id="coordinates" url="/timeseries" routeName={routeName} />
                 </ChartContainer>
                 {available_routes.length && <SearchIcon onClick={this.openDialog} className="search-button"/>}
                 <SearchDialog open={open}
-                              closeDialog={this.closeDialog}
-                              routeName={routeName}
-                              data={available_routes}
+                    closeDialog={this.closeDialog}
+                    routeName={routeName}
+                    data={available_routes}
                 />
             </React.Fragment>
         )

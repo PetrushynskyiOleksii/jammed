@@ -37,6 +37,13 @@
     cursor: pointer;
 }
 
+.search-item-active {
+    color: #d3864d;
+    font-size: 20px;
+    margin: 10px 30px 10px 0;
+    cursor: pointer;
+}
+
 .search-item-active,
 .search-item:hover {
     color: #d3864d;

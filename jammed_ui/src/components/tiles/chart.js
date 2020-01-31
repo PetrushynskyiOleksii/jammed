@@ -1,9 +1,7 @@
 import React from 'react';
 import Loader from 'react-loader-spinner'
 
-import ErrorIcon from '@material-ui/icons/Error';
-import WarningIcon from '@material-ui/icons/Warning'
-import BlockIcon from '@material-ui/icons/Block';
+import { ICONS } from "../../services/constants"
 
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import './chart.css';
@@ -65,17 +63,12 @@ export class ChartLoader extends React.Component {
 }
 
 export class ChartError extends React.Component{
-    icons = {
-        error: <ErrorIcon />,
-        warning: <WarningIcon />,
-        empty: <BlockIcon />
-    };
     render() {
         const { icon, text } = this.props
         return (
             <React.Fragment>
                 <div className="chart-text">{text}</div>
-                {this.icons[icon]}
+                {ICONS[icon]}
             </React.Fragment>
         )
     }

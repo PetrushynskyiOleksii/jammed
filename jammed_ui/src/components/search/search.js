@@ -8,34 +8,30 @@ import "./search.css"
 
 export default class SearchDialog extends React.Component {
 
-    setRouteName = (name) => {
-        localStorage.setItem("routeName", name);
+    setRouteName = (event) => {
+        localStorage.setItem("routeName", event.target.dataset.name);
         this.props.closeDialog();
     };
 
-    activeRoute(name) {
-        return this.props.routeName === name ? " search-item-active" : ""
-    }
-
-    routes(routeNames){
-        return routeNames.map(name =>
-            <div key={name} className={"search-item " + this.activeRoute(name)}
-                onClick={() => this.setRouteName(name)}>
-                {name}
-            </div>
-        )
-    }
-
     render() {
-        const { data, open, closeDialog } = this.props;
+        const { data, open, closeDialog, routeName } = this.props;
         return (
             <Dialog open={open} onClose={closeDialog}>
                 <DialogContent >
                     {data.map(route =>
                         <React.Fragment key={route.route_type}>
-                            <div className="search-section-title">{route.route_type}</div>
+                            <div className="search-section-title">
+                                {route.route_type}
+                            </div>
                             <div className="search-items-container">
-                                {this.routes(route.route_names)}
+                                {route.route_names.map(name =>
+                                    <div key={name}
+                                         className={routeName !== name ? "search-item": "search-item-active" }
+                                         data-name={name}
+                                         onClick={this.setRouteName}>
+                                         {name}
+                                    </div>
+                                )}
                             </div>
                         </React.Fragment>
                     )}

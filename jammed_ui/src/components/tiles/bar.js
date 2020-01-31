@@ -7,7 +7,21 @@ import { ChartTitle, ChartLoader, ChartError, ChartCell } from "./chart";
 import './tiles.css';
 
 
-export default class BarTile extends React.Component {
+class BarTile extends React.PureComponent {
+    render() {
+        const { yDomain, data } = this.props;
+        return (
+            <BarChart width={450} height={250} data={data}>
+                <XAxis dataKey="id" interval={0} />
+                <YAxis domain={yDomain} />
+                <Bar dataKey="value" />
+            </BarChart>
+        )
+    }
+}
+
+
+export default class BarContainer extends React.Component {
     state = {
         data: [],
         limit: 10,
@@ -82,11 +96,7 @@ export default class BarTile extends React.Component {
             <ChartCell>
                 <ChartTitle title={this.props.id}/>
                 <div onClick={this.nextPage} onContextMenu={this.prevPage}>
-                    <BarChart width={450} height={250} data={data}>
-                        <XAxis dataKey="id" interval={0} />
-                        <YAxis domain={this.yDomain()} />
-                        <Bar dataKey="value" />
-                    </BarChart>
+                    <BarTile yDomain={this.yDomain()} data={data} />
                 </div>
             </ChartCell>
         )

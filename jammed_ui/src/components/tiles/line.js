@@ -10,7 +10,31 @@ import './tiles.css';
 
 const HOUR = 3600 * 1000;
 
-export default class LineTile extends React.Component {
+
+class LineTile extends React.PureComponent {
+    render() {
+        return (
+            <LineChart width={450} height={250} data={this.props.data} >
+                <XAxis interval="preserveStartEnd" domain={["auto", "auto"]}
+                       type="number"
+                       dataKey="timestamp"
+                       tickFormatter={formatTimestamp}
+                       tickCount={6}
+                />
+                <YAxis domain={["auto", "auto"]} />
+                <Line strokeWidth={1.5}
+                      stroke="#d3864d"
+                      type="monotone"
+                      dot={false}
+                      dataKey="value"
+                />
+            </LineChart>
+        )
+    }
+}
+
+
+export default class LineContainer extends React.Component {
     deltas = [HOUR, 3 * HOUR, 6 * HOUR, 12 * HOUR, 24 * HOUR];
     state = {
         data: [],
@@ -84,21 +108,7 @@ export default class LineTile extends React.Component {
                 <ChartTitle title={id} routeName={routeName} />
                 <ChartLastValue value={this.getLastValue()} />
                 <div onClick={this.changePeriod} onContextMenu={this.changePeriod}>
-                <LineChart width={450} height={250} data={data} >
-                    <XAxis interval="preserveStartEnd" domain={["auto", "auto"]}
-                           type="number"
-                           dataKey="timestamp"
-                           tickFormatter={formatTimestamp}
-                           tickCount={6}
-                    />
-                    <YAxis domain={["auto", "auto"]} />
-                    <Line strokeWidth={1.5}
-                          stroke="#d3864d"
-                          type="monotone"
-                          dot={false}
-                          dataKey="value"
-                    />
-                </LineChart>
+                    <LineTile data={data}/>
                 </div>
             </ChartCell>
         )
