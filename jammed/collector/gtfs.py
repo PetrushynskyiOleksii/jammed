@@ -8,10 +8,9 @@ import logging
 from datetime import datetime
 
 from mongo.worker import MONGER
-from api.route import get_routes_by_date
-from utils.file_helpers import download_context, dump_csv
+from utils.file_helpers import download_context
 from utils.easyway_helpers import compile_gtfs, parse_routes
-from settings import TIMESERIES_COLLECTION, VEHICLE_URL, COLLECTED_DIR
+from settings import TIMESERIES_COLLECTION, VEHICLE_URL
 
 
 DEFAULT_SLEEP_TIME = 10
@@ -72,17 +71,6 @@ class GTFSCollector:
         Define commands to repeat its per frequency.
         """
         while True:
-            current_date = datetime.now()
-            if self.collect_date.day != current_date.day:
-                collected_routes = get_routes_by_date(self.collect_date)
-                filename = f'{self.collect_date.strftime("%Y%m%d")}.json'
-                dumped = dump_csv(f'{COLLECTED_DIR}/{filename}', collected_routes)
-                if not dumped:
-                    LOGGER.error(f"Could not dump trips to `{filename}`")
-
-                LOGGER.info(f'Dumped route trips to `{filename}`')
-                self.collect_date = current_date
-
             executed = self.collect()
             if executed:
                 self.attempts = 1

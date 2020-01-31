@@ -15,6 +15,7 @@ services:
     command: bash -c "cron && python manage.py collect -f 300"
     volumes:
       - collected-data:/var/collected
+      - /var/log/jammed/collector.log:/var/log/jammed.log
       - .:/jammed
     depends_on:
       - mongodb
@@ -24,6 +25,7 @@ services:
     build: ./jammed
     command: python manage.py runserver -d
     volumes:
+      - /var/log/jammed/api.log:/var/log/jammed.log
       - .:/jammed
     ports:
       - 5000:5000

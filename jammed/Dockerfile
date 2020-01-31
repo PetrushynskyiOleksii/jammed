@@ -20,5 +20,3 @@ WORKDIR /jammed/jammed
 COPY requirements.txt /jammed/jammed
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
-
-# TODO: add bind volume for logging

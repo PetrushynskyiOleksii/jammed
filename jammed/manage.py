@@ -12,8 +12,8 @@ from flask_script import Manager
 from api.views import JAMMED
 from mongo.worker import MONGER
 from collector.gtfs import GTFS_COLLECTOR
-from settings import EASYWAY_STATIC_DIR, STATIC_URL, LOG_DIR
 from utils.geo_helpers import geo_reverse
+from settings import EASYWAY_STATIC_DIR, STATIC_URL, LOG_DIR, TIMESERIES_COLLECTION, COLLECTED_DIR
 from utils.file_helpers import download_context, dump_csv, load_csv, unzip
 from utils.easyway_helpers import (
     get_transport_counts,
@@ -29,7 +29,7 @@ LOGGER = logging.getLogger('JAMMED')
 LOGGER.setLevel(logging.DEBUG)
 
 c_handler = logging.StreamHandler()
-f_handler = logging.FileHandler(f'/var/log/jammed.log')
+f_handler = logging.FileHandler(f'{LOG_DIR}/jammed.log')
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 c_handler.setFormatter(formatter)
@@ -109,12 +109,33 @@ def populate_counts():
         'stops_per_regions': get_stops_per_regions()
     })
     for collection_id, documents in static_data.items():
+        deleted_count = MONGER.remove({}, collection_id)
+        LOGGER.info(f'Removed {deleted_count} documents from `{collection_id}`.')
+
         inserted_ids = MONGER.insert(documents, collection_id)
         LOGGER.info(f'Inserted {len(inserted_ids)} documents to `{collection_id}`.')
 
 
-@manager.command
-def collect(frequency=300):
+@manager.option('-g', '--gte', dest="gte", help='Start timestamp for dumping routes.', type=int)
+@manager.option('-l', '--lte', dest="lte", help='End timestamp for dumping routes.', type=int)
+@manager.option('-f', '--filename', dest="filename", help='Filename to dump routes.', default="routes.csv")
+def dump_routes(gte, lte, filename):
+    """Dump routes in specified time period to csv file."""
+    routes = MONGER.find(
+        TIMESERIES_COLLECTION,
+        query_filter={"timestamp": {"$gte": gte, "$lte": lte}},
+        fields={"_id": 0}
+    )
+    dumped = dump_csv(f'{COLLECTED_DIR}/{filename}.json', routes)
+    if not dumped:
+        LOGGER.error(f'Could not dump routes trips to `{filename}.json`')
+        return
+
+    LOGGER.info(f'Dumped {len(routes)} routes trips to `{filename}.json`')
+
+
+@manager.option('-f', '--frequency', dest="frequency", help='Frequency of executing collecting', type=int)
+def collect(frequency):
     """
     Run collector with specified frequency.
     """

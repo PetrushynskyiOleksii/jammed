@@ -67,7 +67,7 @@ def dump_csv(filepath, dictionaries):
             writer = csv.DictWriter(csv_file, fieldnames=fields)
             writer.writeheader()
             writer.writerows(dictionaries)
-        except csv.Error:
+        except (csv.Error, IndexError):
             return False
 
     return True
