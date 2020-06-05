@@ -1,7 +1,8 @@
 import React from "react"
 
-import AreaContainer from "../tiles/area/area"
-import { ChartsContainer } from "../chart/chart"
+import ChartsContainer from "../chart/chartsContainer"
+import AreaContainer from "../tiles/area/areaContainer"
+import ScatterContainer from "../tiles/scatter/scatterContainer"
 
 import "./pages.sass"
 
@@ -37,6 +38,11 @@ export default class TransportCharts extends React.PureComponent {
                         operation="avg"
                         field="trip_distance"
                         title="avg distance"
+                    />
+                    <ScatterContainer
+                        path="/timeseries"
+                        route={route}
+                        title="coordinates"
                     />
                 </ChartsContainer>
             </div>
