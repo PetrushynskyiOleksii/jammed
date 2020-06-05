@@ -1,0 +1,44 @@
+.charts-container
+    display: flex
+    justify-content: center
+    flex-wrap: wrap
+
+.chart-cell
+    display: flex
+    flex-direction: column
+    background-color: $black-light
+    width: 300px
+    height: 400px
+    margin: 25px
+    box-shadow: 0 0 50px #000000
+
+    .chart-header
+        display: flex
+        color: $grey
+        font-size: 24px
+        padding: 15px 15px 10px 15px
+        text-transform: uppercase
+        justify-content: space-between
+        background-color: $black
+        .chart-title
+            cursor: pointer
+            &:hover
+                color: $yellow
+        .route-name
+            color: $yellow
+            font-weight: bold
+
+    .chart-message
+        display: flex
+        justify-content: center
+        flex-direction: column
+        align-items: center
+        height: 100%
+        margin-bottom: 50px
+        .chart-message-text
+            font-size: 24px
+            color: $yellow
+            padding-bottom: 5px
+        .MuiSvgIcon-root
+            font-size: 50px !important
+            color: $yellow !important
