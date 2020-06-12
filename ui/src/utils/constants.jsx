@@ -24,3 +24,6 @@ export const WHITE_COLOR = "#FFFFFF"
 // CHART STUFF
 export const CHART_WIDTH = 300
 export const CHART_HEIGHT = 275
+
+// ENDPOINTS PATHS
+export const TIMESERIES_PATH = "/routes/timeseries"
