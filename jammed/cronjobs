@@ -1,8 +1,0 @@
-@reboot /usr/local/bin/python /jammed/jammed/manage.py prepare_static
-@reboot /usr/local/bin/python /jammed/jammed/manage.py prepare_regions
-@reboot /usr/local/bin/python /jammed/jammed/manage.py populate_counts
-
-0 0 * * * /usr/local/bin/python /jammed/jammed/manage.py dump_routes --gte=$(date --date="yesterday 00:00:00" +\%s) --lte=$(date --date="yesterday 23:59:59" +\%s) --filename=$(date --date="yesterday" +\%Y-\%m-\%d)
-0 3 * * * /usr/local/bin/python /jammed/jammed/manage.py prepare_static
-5 3 * * * /usr/local/bin/python /jammed/jammed/manage.py prepare_regions
-10 3 * * * /usr/local/bin/python /jammed/jammed/manage.py populate_counts
