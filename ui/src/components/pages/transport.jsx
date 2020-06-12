@@ -10,38 +10,32 @@ import "./pages.sass"
 export default class TransportCharts extends React.PureComponent {
 
     state = {
-        route: "Т08"
+        route: "А10"
     }
 
     render() {
-        const { route }  = this.props
+        const { route } = this.state
         return (
             <div id="transport-page">
                 <ChartsContainer>
                     <AreaContainer
-                        path="/timeseries"
                         route={route}
-                        operation="sum"
-                        field="1"
+                        path="trips_count"
                         title="trips count"
                     />
                     <AreaContainer
-                        path="/timeseries"
                         route={route}
-                        operation="avg"
-                        field="trip_speed"
+                        path="avg_speed"
                         title="avg speed"
                     />
                     <AreaContainer
-                        path="/timeseries"
                         route={route}
-                        operation="avg"
-                        field="trip_distance"
+                        path="avg_distance"
                         title="avg distance"
                     />
                     <ScatterContainer
-                        path="/timeseries"
                         route={route}
+                        path="coordinates"
                         title="coordinates"
                     />
                 </ChartsContainer>

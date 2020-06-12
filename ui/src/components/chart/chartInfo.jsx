@@ -7,7 +7,7 @@ export default class ChartInfo extends React.PureComponent {
         return (
             <div className="chart-info">
                 {Object.keys(info).map(row => (
-                    <div className="chart-info-row">
+                    <div key={row} className="chart-info-row">
                         {row}:
                         <span className="chart-info-row-value">
                             {info[row]}
