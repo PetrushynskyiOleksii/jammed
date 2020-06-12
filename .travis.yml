@@ -1,0 +1,29 @@
+matrix:
+  include:
+    - language: python
+      python: 3.8
+      cache: pip
+
+      install:
+        - pip install -r collector/requirements.txt
+        - pip install -r server/requirements.txt
+        - pip install -r requirements.txt
+
+      script:
+        - pylint --rcfile=.pylintrc ./collector/ --init-hook='sys.path.extend(["./collector/"])'
+        - pylint --rcfile=.pylintrc ./server/ --init-hook='sys.path.extend(["./server/"])'
+
+    - language: node_js
+      node_js: 14.3
+      cache: yarn
+      before_install:
+        - cd ui
+      install:
+        - yarn install
+      script:
+        - yarn lint
+
+branches:
+  only:
+  - master
+  - develop

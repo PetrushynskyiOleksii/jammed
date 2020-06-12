@@ -1,46 +1,47 @@
 version: '3.7'
 
 services:
+  # Set password
   mongodb:
     container_name: jammed_mongodb
     image: mongo
     volumes:
       - mongo-data:/data/db
     ports:
-      - 27017:27017
+      - 27017
+    restart: always
 
   collector:
     container_name: jammed_collector
-    build: ./jammed
-    command: bash -c "cron && python manage.py collect -f 300"
+    build: ./collector
+    env_file:
+      - .env
+    command: python run.py -f 300
+    stdin_open: true
+    tty: true
     volumes:
-      - collected-data:/var/collected
-      - /var/log/jammed/collector.log:/var/log/jammed.log
-      - .:/jammed
+      - /var/log/jammed/collector.log:/var/log/collector.log
+      - ./collector:/collector
     depends_on:
       - mongodb
+    restart: always
 
-  api:
-    container_name: jammed_api
-    build: ./jammed
-    command: python manage.py runserver -d
+  server:
+    container_name: jammed_server
+    build: ./server
+    env_file:
+      - .env
+    command: python run.py
+    stdin_open: true
+    tty: true
     volumes:
-      - /var/log/jammed/api.log:/var/log/jammed.log
-      - .:/jammed
+      - /var/log/jammed/server.log:/var/log/server.log
+      - ./server:/server
     ports:
       - 5000:5000
-
-  ui:
-    container_name: jammed_ui
-    build: ./jammed_ui
-    command: npm start
-    volumes:
-      - .:/jammed
-      - node-modules:/jammed/jammed_ui/node_modules
-    ports:
-      - 3000:3000
+    depends_on:
+      - mongodb
+    restart: always
 
 volumes:
-  node-modules:
   mongo-data:
-  collected-data:
