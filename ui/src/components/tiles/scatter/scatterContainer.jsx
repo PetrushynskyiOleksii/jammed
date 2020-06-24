@@ -1,14 +1,14 @@
 import React from "react"
 
-import ChartCell from "../../chart/chartCell"
-import ChartHeader from "../../chart/chartHeader"
-import ChartMessage from "../../chart/chartMessage"
-import ChartLoader from "../../chart/chartLoader"
-import ChartInfo from "../../chart/chartInfo"
+import ChartCell from "@components/chart/chartCell"
+import ChartHeader from "@components/chart/chartHeader"
+import ChartMessage from "@components/chart/chartMessage"
+import ChartLoader from "@components/chart/chartLoader"
+import ChartInfo from "@components/chart/chartInfo"
+import { TIMESERIES_PATH } from "@utils/constants"
+import { formatTime } from "@utils/helpers"
+import request from "@utils/request"
 import ScatterTile from "./scatter"
-import { TIMESERIES_PATH } from "../../../utils/constants"
-import { formatTime } from "../../../utils/helpers"
-import request from "../../../utils/request"
 
 
 export default class ScatterContainer extends React.Component {
@@ -22,6 +22,12 @@ export default class ScatterContainer extends React.Component {
 
     componentDidMount() {
         this.queryData()
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.route !== this.props.route) {
+            this.queryData()
+        }
     }
 
     queryData = () => {

@@ -2,7 +2,7 @@ import React from "react"
 
 import { ScatterChart, Scatter, XAxis, YAxis } from "recharts"
 
-import { YELLOW_COLOR, CHART_HEIGHT, CHART_WIDTH } from "../../../utils/constants"
+import { BLUE_COLOR, CHART_HEIGHT, CHART_WIDTH } from "@utils/constants"
 
 export default class ScatterTile extends React.PureComponent {
     render() {
@@ -15,7 +15,7 @@ export default class ScatterTile extends React.PureComponent {
             >
                 <XAxis domain={["auto", "auto"]} type="number" dataKey="latitude" hide={true}/>
                 <YAxis domain={["auto", "auto"]} type="number" dataKey="longitude" hide={true}/>
-                <Scatter data={data} fill={YELLOW_COLOR}/>
+                <Scatter data={data} fill={BLUE_COLOR}/>
             </ScatterChart>
         )
     }

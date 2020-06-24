@@ -1,15 +1,14 @@
 import React from "react"
 
-import ChartHeader from "../../chart/chartHeader"
-import ChartLoader from "../../chart/chartLoader"
-import ChartMessage from "../../chart/chartMessage"
-import ChartCell from "../../chart/chartCell"
-import ChartInfo from "../../chart/chartInfo"
+import ChartHeader from "@components/chart/chartHeader"
+import ChartLoader from "@components/chart/chartLoader"
+import ChartMessage from "@components/chart/chartMessage"
+import ChartCell from "@components/chart/chartCell"
+import ChartInfo from "@components/chart/chartInfo"
+import { TIMESERIES_PATH } from "@utils/constants"
+import { convertToHour } from "@utils/helpers"
+import request from "@utils/request"
 import AreaTile from "./area"
-
-import { TIMESERIES_PATH } from "../../../utils/constants"
-import { convertToHour } from "../../../utils/helpers"
-import request from "../../../utils/request"
 
 
 export default class AreaContainer extends React.Component {
@@ -17,7 +16,6 @@ export default class AreaContainer extends React.Component {
     state = {
         loading: false,
         error: false,
-        delta: 3600, // 1 hour in seconds
         timeseries: []
     }
 
@@ -25,14 +23,21 @@ export default class AreaContainer extends React.Component {
         this.queryData(this.state.delta)
     }
 
+    componentDidUpdate(prevProps) {
+        const { period: prevPeriod, route: prevRoute } = prevProps
+        const { period, route } = this.props
+        if (prevPeriod !== period || prevRoute !== route) {
+            this.queryData()
+        }
+    }
+
     queryData = () => {
-        const { route, path } = this.props
-        const { delta } = this.state
+        const { route, path, period } = this.props
         if (!route) return
 
         this.setState({ loading: true })
         const endpoint_path = `${TIMESERIES_PATH}/${route}/${path}`
-        request.get(endpoint_path, { delta })
+        request.get(endpoint_path, { delta: period })
             .then(response => {
                 this.setState({
                     timeseries: response.data.result,
@@ -48,8 +53,8 @@ export default class AreaContainer extends React.Component {
     }
 
     render() {
-        const { error, loading, timeseries, delta } = this.state
-        const { route, title } = this.props
+        const { error, loading, timeseries } = this.state
+        const { route, title, period: delta } = this.props
 
         if (!route) return (
             <ChartCell>

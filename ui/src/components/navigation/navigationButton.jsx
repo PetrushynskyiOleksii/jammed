@@ -1,7 +1,7 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 
-import { TRANSPORT_ICON, STATIC_ICON } from "../../utils/constants"
+import { TRANSPORT_ICON, STATIC_ICON } from "@utils/constants"
 
 
 const ICONS = {

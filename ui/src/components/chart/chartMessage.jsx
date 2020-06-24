@@ -1,6 +1,6 @@
 import React from "react"
 
-import { EMPTY_ICON, ERROR_ICON, WARNING_ICON } from "../../utils/constants"
+import { EMPTY_ICON, ERROR_ICON, WARNING_ICON } from "@utils/constants"
 
 import "./chart.sass"
 

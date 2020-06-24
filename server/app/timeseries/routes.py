@@ -135,3 +135,25 @@ class RoutesTimeseries:
             return None
 
         return RoutesTimeseries._format_timeseries(cursor)
+
+    @classmethod
+    def routes_names(cls, delta):
+        """Retrieve unique route names for the specific period."""
+        start, end = RoutesTimeseries.get_time_range(delta)
+        pipeline = [
+            {"$match": {
+                "route_short_name": {"$ne": ""},
+                "timestamp": {"$gte": start, "$lte": end},
+            }},
+            {"$group": {
+                "_id": "$route_type",
+                "route_names": {"$addToSet": "$route_short_name"}
+            }}
+        ]
+        try:
+            cursor = cls.collection.aggregate(pipeline)
+        except PyMongoError as err:
+            LOG.error("Couldn't retrieve aggregated timeseries: %s", err)
+            return None
+
+        return cursor

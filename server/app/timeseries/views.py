@@ -61,3 +61,21 @@ def get_route_coordinates(route):
 
     coordinates = timeseries[0] if timeseries else None
     return response(True, coordinates, 200)
+
+
+@timeseries_app.route("timeseries/routes", methods=['GET'])
+def get_routes_names():
+    """Return json response with available routes from easyway for last period."""
+    delta = request.args.get("delta", type=float, default=3600)
+    result = RoutesTimeseries.routes_names(delta)
+    if result is None:
+        message = "Couldn't retrieve data from database. Try again, please."
+        return response(False, message, 503)
+
+    routes = []
+    for route in result:
+        route_names = sorted(route["route_names"])
+        routes.append({"route_type": route["_id"], "route_names": route_names})
+
+    routes = sorted(routes, key=lambda x: -len(x["route_names"]))
+    return response(True, routes, 200)

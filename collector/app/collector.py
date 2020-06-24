@@ -1,8 +1,8 @@
 """This module provides daemon to work with GTFS data."""
 
+import re
 import time
 import logging
-import functools
 from datetime import datetime
 
 from pymongo.errors import PyMongoError
@@ -13,13 +13,13 @@ from app.easyway import compile_gtfs, parse_routes_names
 
 
 LOG = logging.getLogger("JAMMED")
-
-
-@functools.lru_cache
-def _routes_names(route_id):
-    """Return route short name by route id."""
-    routes = parse_routes_names()
-    return routes.get(route_id)
+ROUTES_NAMES = parse_routes_names()
+ROUTE_TYPE_MAP = {
+    "А": "Автобус",
+    "Н-А": "Нічний Автобус",
+    "Т": "Трамвай",
+    "Тр": "Тролейбус"
+}
 
 
 class GTFSCollector:
@@ -59,6 +59,7 @@ class GTFSCollector:
         """Prepare route to inserting to database."""
         routes = []
         timestamp = int(time.time())
+        route_type_re = re.compile(r"\d+")
         for route_id, trips in gtfs_compiled.items():
             for trip in trips:
                 vehicle_id = trip["vehicle_id"]
@@ -66,9 +67,14 @@ class GTFSCollector:
                 prev_odometer = self.prev_odometers.get(vehicle_id, curr_odometer)
                 self.prev_odometers[vehicle_id] = curr_odometer
 
+                route_short_name = ROUTES_NAMES.get(route_id, "")
+                route_type_short = re.sub(route_type_re, "", route_short_name)
+                route_type = ROUTE_TYPE_MAP.get(route_type_short, "Інші")
+
                 routes.append({
                     "route_id": route_id,
-                    "route_short_name": _routes_names(route_id),
+                    "route_short_name": route_short_name,
+                    "route_type": route_type,
 
                     "trip_latitude": trip.get("latitude"),
                     "trip_longitude": trip.get("longitude"),

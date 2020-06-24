@@ -2,7 +2,7 @@ import React from "react"
 
 import { Area, AreaChart, YAxis } from "recharts"
 
-import { WHITE_COLOR, YELLOW_COLOR, CHART_HEIGHT, CHART_WIDTH } from "../../../utils/constants"
+import { WHITE_COLOR, BLUE_COLOR, CHART_HEIGHT, CHART_WIDTH } from "@utils/constants"
 
 
 export default class AreaTile extends React.PureComponent {
@@ -17,11 +17,11 @@ export default class AreaTile extends React.PureComponent {
             >
                 <defs>
                     <linearGradient id="y-points" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="25%" stopColor={YELLOW_COLOR} stopOpacity={1}/>
+                        <stop offset="25%" stopColor={BLUE_COLOR} stopOpacity={1}/>
                         <stop offset="100%" stopColor={WHITE_COLOR} stopOpacity={0.5}/>
                     </linearGradient>
                 </defs>
-                <YAxis domain={["auto", "auto"]} hide={true}/>
+                <YAxis domain={[0, "dataMax + 5"]} hide={true}/>
                 <Area dataKey="value" stroke={null} fill="url(#y-points)"/>
             </AreaChart>
         )

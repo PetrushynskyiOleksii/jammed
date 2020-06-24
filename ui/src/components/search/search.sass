@@ -1,0 +1,69 @@
+.search-button
+    position: fixed
+    bottom: 0
+    right: 0
+    margin: 0 25px 25px 0
+    .MuiSvgIcon-root
+        color: $blue
+        font-size: 54px !important
+        &:hover
+            color: $grey !important
+            cursor: pointer
+        &:active
+            color: $blue !important
+            opacity: 0.5
+            cursor: pointer
+
+
+.MuiPaper-root
+    min-width: 300px
+    width: 400px
+    background-color: $black-light !important
+    .search-dialog
+        padding: 0 !important
+
+        .search-period
+            height: 75px
+            background-color: $black
+            .MuiSlider-root
+                color: $blue
+                span:hover
+                    box-shadow: 0 0 0 7px rgba($blue, 0.1)
+                span:active
+                    box-shadow: 0 0 0 7px rgba($blue, 0.25)
+            .search-period-title
+                color: $grey
+                font-size: 24px
+                padding: 15px 15px 0 15px
+            .search-period-value
+                color: $blue
+                font-weight: bold
+                margin-left: 5px
+            .search-period-slider
+                padding: 0 15px
+
+        .search-transport-wrapper
+            .search-transport-title
+                font-size: 24px
+                color: $grey
+                font-weight: bold
+                margin: 10px 0 0 15px
+
+            .search-transport-container
+                display: flex
+                flex-wrap: wrap
+                min-width: 250px
+
+                .search-transport
+                    color: $grey
+                    font-size: 20px
+                    margin: 5px 0 5px 15px
+                    cursor: pointer
+                    &.search-transport-active
+                        color: $blue
+                        font-weight: bold
+                    &:hover
+                        color: $blue
+
+            &:last-child
+                margin-bottom: 15px
