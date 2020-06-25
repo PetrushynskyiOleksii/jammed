@@ -8,24 +8,19 @@ from datetime import datetime
 from pymongo.errors import PyMongoError
 
 from settings import VEHICLE_URL
+from app import database
 from app.utils import download_context
-from app.easyway import compile_gtfs, parse_routes_names
+from app.easyway import compile_gtfs, parse_routes_names, ROUTE_TYPE_MAP
 
 
 LOG = logging.getLogger("JAMMED")
 ROUTES_NAMES = parse_routes_names()
-ROUTE_TYPE_MAP = {
-    "А": "Автобус",
-    "Н-А": "Нічний Автобус",
-    "Т": "Трамвай",
-    "Тр": "Тролейбус"
-}
 
 
 class GTFSCollector:
     """Daemon class that provides collecting GTFS data from EasyWay."""
 
-    def __init__(self, database, frequency):
+    def __init__(self, frequency):
         """Initializes the new daemon instance with provided configurations."""
         self.collect_date = datetime.now()
         self.frequency = frequency

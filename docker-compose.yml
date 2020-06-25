@@ -16,7 +16,7 @@ services:
     build: ./collector
     env_file:
       - .env
-    command: python run.py -f 300
+    command: bash -c "printenv >> /etc/environment && cron && python run.py -f 300"
     stdin_open: true
     tty: true
     volumes:
