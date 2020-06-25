@@ -54,30 +54,30 @@ export default class AreaContainer extends React.Component {
 
     render() {
         const { error, loading, timeseries } = this.state
-        const { route, title, period: delta } = this.props
+        const { route, title, theme, period: delta } = this.props
 
         if (!route) return (
             <ChartCell>
-                <ChartHeader refresh={this.queryData} title={title}/>
-                <ChartMessage text="No route chosen" icon="empty"/>
+                <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
+                <ChartMessage theme={theme} text="No route chosen" icon="empty"/>
             </ChartCell>
         )
         else if (error) return (
             <ChartCell>
-                <ChartHeader refresh={this.queryData} title={title}/>
-                <ChartMessage text="Data could not be loaded" icon="error"/>
+                <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
+                <ChartMessage theme={theme} text="Data could not be loaded" icon="error"/>
             </ChartCell>
         )
         else if (loading) return (
             <ChartCell>
-                <ChartHeader refresh={this.queryData} title={title}/>
-                <ChartLoader/>
+                <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
+                <ChartLoader theme={theme} />
             </ChartCell>
         )
         else if (!timeseries.length) return (
             <ChartCell>
-                <ChartHeader refresh={this.queryData} title={title}/>
-                <ChartMessage text="No data points" icon="warning"/>
+                <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
+                <ChartMessage theme={theme} text="No data points" icon="warning"/>
             </ChartCell>
         )
 
@@ -86,8 +86,8 @@ export default class AreaContainer extends React.Component {
 
         return (
             <ChartCell>
-                <ChartHeader refresh={this.queryData} title={title} subtitle={route}/>
-                <ChartInfo info={{"Last value": lastValue, "Period": period}}/>
+                <ChartHeader theme={theme} refresh={this.queryData} title={title} subtitle={route}/>
+                <ChartInfo theme={theme} info={{"Last value": lastValue, "Period": period}}/>
                 <AreaTile data={timeseries}/>
             </ChartCell>
         )

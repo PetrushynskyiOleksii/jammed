@@ -5,20 +5,20 @@
     .nav-item
         margin: 10px 20px 25px 20px
         svg
-            color: $grey
+            color: $dark-grey
             font-size: 54px !important
         .nav-label
-            color: $grey
+            color: $dark-grey
             text-transform: uppercase
             text-align: center
             font-size: 18px
-        &.nav-item-active
+        &-active
             .MuiSvgIcon-root, .nav-label
-                color: $blue !important
-        &:hover
+                color: $white !important
+        &:hover:not(.nav-item-active)
             .MuiSvgIcon-root, .nav-label
-                color: $grey !important
+                color: $white !important
         &:active
             .MuiSvgIcon-root, .nav-label
-                color: $blue !important
+                color: $white !important
                 opacity: 0.5

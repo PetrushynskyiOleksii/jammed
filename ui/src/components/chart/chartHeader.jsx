@@ -5,10 +5,15 @@ import "./chart.sass"
 
 export default class ChartHeader extends React.PureComponent {
     render() {
-        const { title, subtitle, refresh } = this.props
+        const { title, subtitle, refresh, theme } = this.props
         return (
             <div className="chart-header">
-                <div onClick={refresh} className="chart-title">{title}</div>
+                <div
+                    onClick={refresh}
+                    className={`chart-title chart-title-${theme}`}
+                >
+                    {title}
+                </div>
                 <div className="chart-subtitle">{subtitle}</div>
             </div>
         )

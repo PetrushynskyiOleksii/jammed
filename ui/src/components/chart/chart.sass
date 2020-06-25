@@ -22,9 +22,14 @@
         background-color: $black
         .chart-title
             cursor: pointer
-            &:hover
+            &-green:hover
+                color: $green
+            &-green:active
+                color: $green
+                opacity: 0.5
+            &-blue:hover
                 color: $blue
-            &:active
+            &-blue:active
                 color: $blue
                 opacity: 0.5
         .chart-subtitle
@@ -38,13 +43,20 @@
         align-items: center
         height: 100%
         margin-bottom: 50px
-        .chart-message-text
+        &-text
             font-size: 24px
-            color: $blue
             padding-bottom: 5px
-        .MuiSvgIcon-root
-            font-size: 50px !important
-            color: $blue !important
+            &-blue
+                color: $blue
+            &-green
+                color: $green
+        &-icon
+            &-blue .MuiSvgIcon-root
+                font-size: 50px !important
+                color: $blue !important
+            &-green .MuiSvgIcon-root
+                font-size: 50px !important
+                color: $green !important
 
     .chart-info
         height: 75px
@@ -53,6 +65,9 @@
         color: $grey
         .chart-info-row
             margin-bottom: 5px
-            .chart-info-row-value
+            &-value
                 margin-left: 5px
-                color: $blue
+                &-green
+                    color: $green
+                &-blue
+                    color: $blue

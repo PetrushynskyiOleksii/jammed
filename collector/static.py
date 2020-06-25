@@ -1,3 +1,5 @@
+"""This module provides populating routes static information."""
+
 import logging
 
 from pymongo.errors import PyMongoError
@@ -52,7 +54,7 @@ def insert_static():
         LOGGER.error("Could not insert routes static data: %s", err)
         return
 
-    LOGGER.info(f"Successfully inserted routes static data.")
+    LOGGER.info("Successfully inserted routes static data.")
 
 
 if __name__ == "__main__":

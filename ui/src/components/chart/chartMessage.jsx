@@ -13,11 +13,15 @@ const ICONS = {
 
 export default class ChartMessage extends React.PureComponent {
     render() {
-        const { icon, text } = this.props
+        const { icon, text, theme } = this.props
         return (
             <div className="chart-message">
-                <div className="chart-message-text">{text}</div>
-                {ICONS[icon]}
+                <div className={`chart-message-text chart-message-text-${theme}`}>
+                    {text}
+                </div>
+                <div className={`chart-message-icon chart-message-icon-${theme}`}>
+                    {ICONS[icon]}
+                </div>
             </div>
         )
     }

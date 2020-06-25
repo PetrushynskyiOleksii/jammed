@@ -4,12 +4,12 @@ import ChartsContainer from "@components/chart/chartsContainer"
 import AreaContainer from "@components/tiles/area/areaContainer"
 import ScatterContainer from "@components/tiles/scatter/scatterContainer"
 import SearchDialog from "@components/search/search"
-import { SEARCH_ICON, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS } from "@utils/constants"
+import { SEARCH_ICON, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS, BLUE_THEME as theme } from "@utils/constants"
 
 import "./pages.sass"
 
 
-export default class TransportCharts extends React.PureComponent {
+export default class TransportPage extends React.PureComponent {
 
     state = {
         searchOpened: false,
@@ -37,24 +37,28 @@ export default class TransportCharts extends React.PureComponent {
             <div id="transport-page">
                 <ChartsContainer>
                     <AreaContainer
+                        theme={theme}
                         period={periodSeconds}
                         route={route}
                         path="trips_count"
                         title="trips count"
                     />
                     <AreaContainer
+                        theme={theme}
                         period={periodSeconds}
                         route={route}
                         path="avg_speed"
                         title="avg speed"
                     />
                     <AreaContainer
+                        theme={theme}
                         period={periodSeconds}
                         route={route}
                         path="avg_distance"
                         title="avg distance"
                     />
                     <ScatterContainer
+                        theme={theme}
                         period={periodSeconds}
                         route={route}
                         path="coordinates"

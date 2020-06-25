@@ -13,11 +13,15 @@
     width: 100%
     overflow: hidden
 
-    .chart-loader-line
+    &-line
         position: relative
         height: 3px
-        background-color: $yellow
         animation-name: loader-animation
         animation-duration: 3s
         animation-iteration-count: infinite
         animation-timing-function: ease-in-out
+
+        &-green
+            background-color: $green
+        &-blue
+            background-color: $blue

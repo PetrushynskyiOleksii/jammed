@@ -5,9 +5,10 @@ import "./chartLoader.sass"
 
 export default class ChartLoader extends React.PureComponent {
     render() {
+        const { theme } = this.props
         return (
             <div className="chart-loader">
-                <div className="chart-loader-line"/>
+                <div className={`chart-loader-line chart-loader-line-${theme}`}/>
             </div>
         )
     }
