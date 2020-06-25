@@ -4,7 +4,6 @@ import ChartCell from "@components/chart/chartCell"
 import ChartHeader from "@components/chart/chartHeader"
 import ChartMessage from "@components/chart/chartMessage"
 import ChartLoader from "@components/chart/chartLoader"
-import ChartInfo from "@components/chart/chartInfo"
 import { TIMESERIES_PATH } from "@utils/constants"
 import { formatTime } from "@utils/helpers"
 import request from "@utils/request"
@@ -85,8 +84,10 @@ export default class ScatterContainer extends React.Component {
         return (
             <ChartCell>
                 <ChartHeader refresh={this.queryData} title={title} subtitle={route} theme={theme}/>
-                <ChartInfo theme={theme} info={{"Last time": timestamp}}/>
-                <ScatterTile data={coordinates}/>
+                <div className="scatter-chart">
+                    <div className="scatter-chart-time">{timestamp}</div>
+                    <ScatterTile data={coordinates}/>
+                </div>
             </ChartCell>
         )
     }
