@@ -11,6 +11,26 @@ from app import DATABASE as db
 LOG = logging.getLogger(__name__)
 
 
+class Routes:
+    """Class that provides methods for interaction with routes static data."""
+
+    collection = db.routes
+
+    @classmethod
+    def static_info(cls, info_id):
+        """Retrieve routes static information by id"""
+        try:
+            cursor = cls.collection.find_one(
+                filter={"id": info_id},
+                projection={'_id': 0}
+            )
+        except PyMongoError as err:
+            LOG.error("Couldn't retrieve route static info (%s): %s", info_id, err)
+            return None
+
+        return cursor.get("data", [])
+
+
 class RoutesTimeseries:
     """Class that provides methods for interaction with route timeseries."""
 
