@@ -29,6 +29,7 @@ export const GREEN_COLOR = "#A8F14C"
 // CHART STUFF
 export const CHART_WIDTH = 300
 export const CHART_HEIGHT = 250
+export const CHART_ANIMATION = 1500
 
 // ENDPOINTS PATHS
 export const TIMESERIES_PATH = "/timeseries"

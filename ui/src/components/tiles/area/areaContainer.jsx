@@ -82,12 +82,12 @@ export default class AreaContainer extends React.Component {
         )
 
         const lastValue = timeseries[timeseries.length - 1].value.toFixed(2)
-        const period = convertToHour(delta) + "h"
+        const period = convertToHour(delta)
 
         return (
             <ChartCell>
                 <ChartHeader theme={theme} refresh={this.queryData} title={title} subtitle={route}/>
-                <ChartInfo theme={theme} info={{"Last value": lastValue, "Period": period}}/>
+                <ChartInfo theme={theme} main={lastValue} sub={`Period: ${period}h`}/>
                 <AreaTile data={timeseries}/>
             </ChartCell>
         )

@@ -3,17 +3,15 @@ import React from "react"
 
 export default class ChartInfo extends React.PureComponent {
     render() {
-        const { info, theme } = this.props
+        const { theme, main, sub } = this.props
         return (
             <div className="chart-info">
-                {Object.keys(info).map(row => (
-                    <div key={row} className="chart-info-row">
-                        {row}:
-                        <span className={`chart-info-row-value chart-info-row-value-${theme}`}>
-                            {info[row]}
-                        </span>
-                    </div>
-                ))}
+                <div className={`chart-info-main chart-info-main-${theme}`}>
+                    {main}
+                </div>
+                <div className="chart-info-sub">
+                    {sub}
+                </div>
             </div>
         )
     }

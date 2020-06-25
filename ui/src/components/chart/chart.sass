@@ -59,15 +59,18 @@
                 color: $green !important
 
     .chart-info
-        height: 75px
-        padding: 15px 15px 10px 15px
-        font-size: 20px
-        color: $grey
-        .chart-info-row
-            margin-bottom: 5px
-            &-value
-                margin-left: 5px
-                &-green
-                    color: $green
-                &-blue
-                    color: $blue
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        height: 100px
+        &-main
+            font-size: 48px
+            font-weight: bold
+            &-green
+                color: $green
+            &-blue
+                color: $blue
+        &-sub
+            font-size: 18px
+            color: $grey

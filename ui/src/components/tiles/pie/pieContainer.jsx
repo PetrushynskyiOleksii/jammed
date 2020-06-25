@@ -3,14 +3,14 @@ import React from "react"
 import ChartHeader from "@components/chart/chartHeader"
 import ChartLoader from "@components/chart/chartLoader"
 import ChartMessage from "@components/chart/chartMessage"
-import ChartCell from "@components/chart/chartCell"
 import ChartInfo from "@components/chart/chartInfo"
+import ChartCell from "@components/chart/chartCell"
 import request from "@utils/request"
 import { ROUTES_PATH } from "@utils/constants"
-import BarTile from "./bar"
+import PieTile from "./pie"
 
 
-export default class BarContainer extends React.Component {
+export default class PieContainer extends React.Component {
 
     state = {
         loading: false,
@@ -48,7 +48,7 @@ export default class BarContainer extends React.Component {
     }
 
     render() {
-        const { error, loading, data, activeIndex } = this.state
+        const { data, error, loading, activeIndex } = this.state
         const { title, theme } = this.props
 
         if (error) return (
@@ -74,9 +74,9 @@ export default class BarContainer extends React.Component {
         return (
             <ChartCell>
                 <ChartHeader theme={theme} refresh={this.queryData} title={title} />
-                <ChartInfo theme={theme} main={value} sub={`Transport: ${id}`}/>
-                <div className="bar-chart">
-                    <BarTile data={data} activeIndex={activeIndex} changeActive={this.changeActive}/>
+                <div className="pie-chart">
+                    <ChartInfo theme={theme} main={value} sub={id} />
+                    <PieTile data={data} activeIndex={activeIndex} changeActive={this.changeActive}/>
                 </div>
             </ChartCell>
         )
