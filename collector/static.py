@@ -42,14 +42,14 @@ def insert_static():
     static_data.update({"stops_per_routes": get_stops_per_routes()})
 
     try:
-        db.routes.delete_many({})
+        db.transport.delete_many({})
     except PyMongoError as err:
         LOGGER.error("Could not flush routes collection: %s", err)
         return
 
     docs = [{"id": k, "data": v} for k, v in static_data.items()]
     try:
-        db.routes.insert_many(docs)
+        db.transport.insert_many(docs)
     except PyMongoError as err:
         LOGGER.error("Could not insert routes static data: %s", err)
         return

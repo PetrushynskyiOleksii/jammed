@@ -1,77 +1,41 @@
 import React from "react"
 
-import ChartsContainer from "@components/chart/chartsContainer"
-import AreaContainer from "@components/tiles/area/areaContainer"
-import ScatterContainer from "@components/tiles/scatter/scatterContainer"
-import SearchDialog from "@components/search/search"
-import { SEARCH_ICON, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS, BLUE_THEME as theme } from "@utils/constants"
+import ChartsContainer from "@components/common/chartsContainer"
+import BarNumber from "@components/tiles/barNumber/barNumber"
+import DonutNumber from "@components/tiles/donutNumber/donutNumber"
+
+import { GREEN_THEME as theme } from "@utils/constants"
 
 import "./pages.sass"
 
 
-export default class TransportPage extends React.PureComponent {
-
-    state = {
-        searchOpened: false,
-        route: localStorage.getItem(ROUTE_KEY),
-        period: localStorage.getItem(PERIOD_KEY) || 1
-    }
-
-    openSearch = () => {
-        this.setState({ searchOpened: true })
-    }
-
-    submit = (route, period) => {
-        this.setState({
-            route,
-            period,
-            searchOpened: false,
-        })
-    };
+export default class StaticPage extends React.PureComponent {
 
     render() {
-        const { route, period, searchOpened } = this.state
-
-        const periodSeconds = parseInt(period) * HOUR_SECONDS
         return (
-            <div id="transport-page">
+            <div id="static-page">
                 <ChartsContainer>
-                    <AreaContainer
+                    <DonutNumber
                         theme={theme}
-                        period={periodSeconds}
-                        route={route}
-                        path="trips_count"
-                        title="trips count"
+                        title="transport per type"
+                        path="transport_per_type"
                     />
-                    <AreaContainer
+                    <BarNumber
                         theme={theme}
-                        period={periodSeconds}
-                        route={route}
-                        path="avg_speed"
-                        title="avg speed"
+                        title="stops per routes"
+                        path="stops_per_routes"
                     />
-                    <AreaContainer
+                    <DonutNumber
                         theme={theme}
-                        period={periodSeconds}
-                        route={route}
-                        path="avg_distance"
-                        title="avg distance"
+                        title="transport per agencies"
+                        path="transport_per_agencies"
                     />
-                    <ScatterContainer
+                    <BarNumber
                         theme={theme}
-                        period={periodSeconds}
-                        route={route}
-                        path="coordinates"
-                        title="coordinates"
+                        title="transport per routes"
+                        path="transport_per_routes"
                     />
                 </ChartsContainer>
-                <div className="search-button" onClick={this.openSearch}>
-                    { SEARCH_ICON }
-                </div>
-                <SearchDialog
-                    open={searchOpened}
-                    submit={this.submit}
-                />
             </div>
         )
     }

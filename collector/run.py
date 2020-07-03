@@ -4,7 +4,7 @@ import os
 import argparse
 import logging
 
-from app.collector import GTFSCollector
+from app.collector import TrafficCollector
 
 
 LOG = logging.getLogger("")
@@ -36,7 +36,7 @@ def main():
     parser.add_argument("-f", "--frequency", type=int, default=300, help="Interval between collector executing.")
     args = parser.parse_args()
 
-    collector = GTFSCollector(args.frequency)
+    collector = TrafficCollector(args.frequency)
     collector.run()
 
 

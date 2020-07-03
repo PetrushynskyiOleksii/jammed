@@ -3,21 +3,24 @@
 import re
 import time
 import logging
+import collections
 from datetime import datetime
 
 from pymongo.errors import PyMongoError
+from shapely.geometry import Point
 
 from settings import VEHICLE_URL
 from app import database
 from app.utils import download_context
-from app.easyway import compile_gtfs, parse_routes_names, ROUTE_TYPE_MAP
+from app.easyway import compile_gtfs, parse_routes_names, ROUTE_TYPE_MAP, REGIONS_BOUNDS
 
 
 LOG = logging.getLogger("JAMMED")
+MIN_DISTANCE = 1 / 0.25  # TODO: get min distance from the database
 ROUTES_NAMES = parse_routes_names()
 
 
-class GTFSCollector:
+class TrafficCollector:
     """Daemon class that provides collecting GTFS data from EasyWay."""
 
     def __init__(self, frequency):
@@ -26,8 +29,10 @@ class GTFSCollector:
         self.frequency = frequency
         self.attempts = 1
         self.sleep_time = 10
-        self.prev_odometers = {}
-        self.collection = database.timeseries
+        self.prev_odometers = {}  # TODO: get prev odometers from database
+
+        self.traffic = database.traffic
+        self.traffic_congestion = database.traffic_congestion
 
     def run(self):
         """Define commands to repeat its per frequency."""
@@ -43,16 +48,17 @@ class GTFSCollector:
             self.attempts = 1
             time.sleep(self.frequency)
 
-    def _insert_routes(self, routes):
-        """Insert collected routes to database."""
+    def _insert_data(self, traffic, congestion):
+        """Insert collected data to database."""
         try:
-            return self.collection.insert_many(routes).inserted_ids
+            self.traffic.insert_many(traffic)
+            self.traffic_congestion.insert_many(congestion)
         except PyMongoError as err:
             LOG.error("Could not insert collected routes: %s", err)
 
-    def _parse_routes(self, gtfs_compiled):
-        """Prepare route to inserting to database."""
-        routes = []
+    def _parse_traffic(self, gtfs_compiled):
+        """Prepare traffic transport timeseries for inserting to database."""
+        traffic = []
         timestamp = int(time.time())
         route_type_re = re.compile(r"\d+")
         for route_id, trips in gtfs_compiled.items():
@@ -66,7 +72,7 @@ class GTFSCollector:
                 route_type_short = re.sub(route_type_re, "", route_short_name)
                 route_type = ROUTE_TYPE_MAP.get(route_type_short, "Інші")
 
-                routes.append({
+                traffic.append({
                     "route_id": route_id,
                     "route_short_name": route_short_name,
                     "route_type": route_type,
@@ -82,7 +88,36 @@ class GTFSCollector:
                     "timestamp": timestamp
                 })
 
-        return routes
+        return traffic
+
+    @staticmethod
+    def _parse_traffic_congestion(traffic):
+        """Prepare traffic congestion for inserting to database."""
+        regions_distances = collections.defaultdict(list)
+        for route in traffic:
+            trip_distance = route["trip_distance"]
+            point = Point((route["trip_latitude"], route["trip_longitude"]))
+            for name, poly in REGIONS_BOUNDS.items():
+                if poly.contains(point):
+                    regions_distances[name].append(trip_distance)
+
+        def get_congestion_percentage(distances):
+            """Return region congestion in percentage."""
+            distances = list(filter(lambda x: x != 0, distances))
+            try:
+                avg_distance = sum(distances) / len(distances)
+                return 100 / avg_distance / MIN_DISTANCE
+            except ZeroDivisionError:
+                return 0
+
+        timestamp = int(time.time())
+        traffic_congestion = [{
+            "id": region,
+            "value": get_congestion_percentage(distances),
+            "timestamp": timestamp
+        } for region, distances in regions_distances.items()]
+
+        return traffic_congestion
 
     def _collect(self):
         """
@@ -99,10 +134,10 @@ class GTFSCollector:
             LOG.error("Failed to compile GTFS data to json format.")
             return False
 
-        routes = self._parse_routes(gtfs_compiled)
-        inserted_ids = self._insert_routes(routes)
-        if not inserted_ids:
-            return False
+        traffic = self._parse_traffic(gtfs_compiled)
+        traffic_congestion = TrafficCollector._parse_traffic_congestion(traffic)
 
-        LOG.info("Successfully inserted %s trips.", len(inserted_ids))
+        self._insert_data(traffic, traffic_congestion)
+
+        LOG.info("Successfully collected %s trips.", len(traffic))
         return True
