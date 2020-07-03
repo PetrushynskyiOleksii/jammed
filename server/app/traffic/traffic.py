@@ -1,40 +1,61 @@
-"""This modules provides functionality to work with route timeseries."""
+"""This modules provides functionality to work with traffic timeseries."""
 
 import logging
-from datetime import datetime
 
 from pymongo.errors import PyMongoError
 
 from app import DATABASE as db
+from app.utils import get_time_range
 
 
 LOG = logging.getLogger(__name__)
 
 
-class Routes:
-    """Class that provides methods for interaction with routes static data."""
+class Congestion:
+    """Class that provides method to work with traffic congestion."""
 
-    collection = db.routes
+    collection = db.traffic_congestion
+
+    @classmethod
+    def region_congestion(cls, region, limit):
+        """Retrieve region congestion by region name."""
+        try:
+            cursor = cls.collection.find(
+                filter={"id": region},
+                limit=15,
+                projection={'_id': 0}
+            )
+        except PyMongoError as err:
+            LOG.error("Couldn't retrieve region congestion (%s): %s", region, err)
+            return None
+
+        return [x for x in cursor]
+
+
+class Transport:
+    """Class that provides methods for interaction with transport static data."""
+
+    collection = db.transport
 
     @classmethod
     def static_info(cls, info_id):
-        """Retrieve routes static information by id"""
+        """Retrieve transport static information by id."""
         try:
             cursor = cls.collection.find_one(
                 filter={"id": info_id},
                 projection={'_id': 0}
             )
         except PyMongoError as err:
-            LOG.error("Couldn't retrieve route static info (%s): %s", info_id, err)
+            LOG.error("Couldn't retrieve transport static info (%s): %s", info_id, err)
             return None
 
         return cursor.get("data", [])
 
 
-class RoutesTimeseries:
-    """Class that provides methods for interaction with route timeseries."""
+class TrafficTimeseries:
+    """Class that provides methods for interaction with traffic timeseries."""
 
-    collection = db.timeseries
+    collection = db.traffic
 
     @staticmethod
     def _format_timeseries(cursor):
@@ -43,17 +64,10 @@ class RoutesTimeseries:
             {"timestamp": x["_id"]["timestamp"], "value": x["value"]} for x in cursor
         ]
 
-    @staticmethod
-    def get_time_range(delta):
-        """Return time range by delta."""
-        end = datetime.now().timestamp()
-        start = end - delta
-        return start, end
-
     @classmethod
     def route_avg_speed(cls, route, delta):
         """Retrieve aggregated timeseries by route average speed."""
-        start, end = RoutesTimeseries.get_time_range(delta)
+        start, end = get_time_range(delta)
         pipeline = [
             {"$match": {
                 "route_short_name": route,
@@ -74,12 +88,12 @@ class RoutesTimeseries:
             LOG.error("Couldn't retrieve aggregated timeseries: %s", err)
             return None
 
-        return RoutesTimeseries._format_timeseries(cursor)
+        return TrafficTimeseries._format_timeseries(cursor)
 
     @classmethod
     def route_trips_count(cls, route, delta):
         """Retrieve aggregated timeseries by routes trips count."""
-        start, end = RoutesTimeseries.get_time_range(delta)
+        start, end = get_time_range(delta)
         pipeline = [
             {"$match": {
                 "route_short_name": route,
@@ -100,12 +114,12 @@ class RoutesTimeseries:
             LOG.error("Couldn't retrieve aggregated timeseries: %s", err)
             return None
 
-        return RoutesTimeseries._format_timeseries(cursor)
+        return TrafficTimeseries._format_timeseries(cursor)
 
     @classmethod
     def route_avg_distance(cls, route, delta):
         """Retrieve aggregated timeseries by routes trip distance."""
-        start, end = RoutesTimeseries.get_time_range(delta)
+        start, end = get_time_range(delta)
         pipeline = [
             {"$match": {
                 "route_short_name": route,
@@ -126,7 +140,7 @@ class RoutesTimeseries:
             LOG.error("Couldn't retrieve aggregated timeseries: %s", err)
             return None
 
-        return RoutesTimeseries._format_timeseries(cursor)
+        return TrafficTimeseries._format_timeseries(cursor)
 
     @classmethod
     def route_coordinates(cls, route):
@@ -154,12 +168,12 @@ class RoutesTimeseries:
             LOG.error("Couldn't retrieve aggregated timeseries: %s", err)
             return None
 
-        return RoutesTimeseries._format_timeseries(cursor)
+        return TrafficTimeseries._format_timeseries(cursor)
 
     @classmethod
     def routes_names(cls, delta):
         """Retrieve unique route names for the specific period."""
-        start, end = RoutesTimeseries.get_time_range(delta)
+        start, end = get_time_range(delta)
         pipeline = [
             {"$match": {
                 "route_short_name": {"$ne": ""},
