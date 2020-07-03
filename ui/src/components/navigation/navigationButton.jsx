@@ -1,12 +1,13 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 
-import { TRANSPORT_ICON, STATIC_ICON } from "@utils/constants"
+import { TRAFFIC_ICON, TRANSPORT_ICON, REGIONS_ICON } from "@utils/constants"
 
 
 const ICONS = {
+    traffic: TRAFFIC_ICON,
     transport: TRANSPORT_ICON,
-    static: STATIC_ICON
+    regions: REGIONS_ICON
 }
 
 export default class NavigationButton extends React.PureComponent {

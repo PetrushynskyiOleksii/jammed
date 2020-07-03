@@ -1,6 +1,6 @@
 import React from "react"
 
-import "./chart.sass"
+import "./common.sass"
 
 
 export default class ChartsContainer extends React.PureComponent {

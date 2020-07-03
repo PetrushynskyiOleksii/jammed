@@ -1,6 +1,6 @@
 import React from "react"
 
-import "./chartLoader.sass"
+import "./common.sass"
 
 
 export default class ChartLoader extends React.PureComponent {

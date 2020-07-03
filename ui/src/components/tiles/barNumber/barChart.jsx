@@ -4,7 +4,6 @@ import { BarChart as BarContainer, Bar, Cell } from "recharts"
 
 import { GREEN_COLOR, CHART_HEIGHT, CHART_WIDTH, CHART_ANIMATION } from "@utils/constants"
 
-import "../../chart/chart.sass"
 
 const CHART_BAR_WIDTH = 15
 const CHART_BAR_MARGIN = 5
@@ -38,13 +37,13 @@ export default class BarChart extends React.PureComponent {
                     onClick={changeActive}
                     animationDuration={CHART_ANIMATION}
                 >
-                    {data.map((entry, index) => (
+                    {data.map((entry, index) =>
                         <Cell
                             cursor="pointer"
                             key={`cell-${index}`}
                             fill={index === activeIndex ? "url(#bar-cell-active)" : "url(#bar-cell)"}
                         />
-                    ))}
+                    )}
                 </Bar>
             </BarContainer>
         )

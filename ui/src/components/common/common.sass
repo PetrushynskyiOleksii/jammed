@@ -1,3 +1,14 @@
+@keyframes loader-animation
+   0%
+       left: -100%
+   49%
+       left: 100%
+   50%
+       left: 100%
+   100%
+       left: -100%
+
+
 .charts-container
     display: flex
     justify-content: center
@@ -32,6 +43,11 @@
             &-blue:active
                 color: $blue
                 opacity: 0.5
+            &-yellow:hover
+                color: $yellow
+            &-yellow:active
+                color: $yellow
+                opacity: 0.5
         .chart-subtitle
             color: $blue
             font-weight: bold
@@ -50,6 +66,8 @@
                 color: $blue
             &-green
                 color: $green
+            &-yellow
+                color: $yellow
         &-icon
             &-blue .MuiSvgIcon-root
                 font-size: 50px !important
@@ -57,6 +75,9 @@
             &-green .MuiSvgIcon-root
                 font-size: 50px !important
                 color: $green !important
+            &-yellow .MuiSvgIcon-root
+                font-size: 50px !important
+                color: $yellow !important
 
     .chart-info
         display: flex
@@ -71,6 +92,28 @@
                 color: $green
             &-blue
                 color: $blue
+            &-yellow
+                color: $yellow
         &-sub
             font-size: 18px
             color: $grey
+
+    .chart-loader
+        height: 5px
+        width: 100%
+        overflow: hidden
+
+        &-line
+            position: relative
+            height: 3px
+            animation-name: loader-animation
+            animation-duration: 3s
+            animation-iteration-count: infinite
+            animation-timing-function: ease-in-out
+
+            &-green
+                background-color: $green
+            &-blue
+                background-color: $blue
+            &-yellow
+                background-color: $yellow

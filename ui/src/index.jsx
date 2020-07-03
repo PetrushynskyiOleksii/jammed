@@ -3,8 +3,9 @@ import React from "react"
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
 
 import NavigationBar from "./components/navigation/navigationBar"
-import TransportPage from "./components/pages/transport.jsx"
-import StaticPage from "./components/pages/static.jsx"
+import TransportPage from "./components/pages/traffic.jsx"
+import StaticPage from "./components/pages/transport.jsx"
+import TrafficPage from "./components/pages/regions.jsx"
 
 import "./index.sass"
 
@@ -14,9 +15,10 @@ ReactDOM.render(
             <Router>
                 <NavigationBar />
                 <Switch>
-                    <Route path="/static" component={StaticPage} />
-                    <Route path="/transport" component={TransportPage} />
-                    <Redirect path="*" to="/transport"/>
+                    <Route path="/regions" component={TrafficPage} />
+                    <Route path="/transport" component={StaticPage} />
+                    <Route path="/traffic" component={TransportPage} />
+                    <Redirect path="*" to="/regions"/>
                 </Switch>
             </Router>
         </React.Fragment>

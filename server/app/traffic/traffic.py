@@ -22,7 +22,7 @@ class Congestion:
         try:
             cursor = cls.collection.find(
                 filter={"id": region},
-                limit=15,
+                limit=limit,
                 projection={'_id': 0}
             )
         except PyMongoError as err:

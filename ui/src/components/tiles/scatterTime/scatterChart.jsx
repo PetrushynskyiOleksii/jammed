@@ -3,7 +3,6 @@ import React from "react"
 import { ScatterChart as ScatterContainer, Scatter, XAxis, YAxis } from "recharts"
 
 import { BLUE_COLOR, CHART_HEIGHT, CHART_WIDTH } from "@utils/constants"
-import "../../chart/chart.sass"
 
 
 const SCATTER_CHART_HEIGHT = CHART_HEIGHT + 100

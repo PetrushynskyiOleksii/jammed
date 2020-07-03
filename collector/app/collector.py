@@ -10,7 +10,7 @@ from pymongo.errors import PyMongoError
 from shapely.geometry import Point
 
 from settings import VEHICLE_URL
-from app import database
+from app import DATABASE
 from app.utils import download_context
 from app.easyway import compile_gtfs, parse_routes_names, ROUTE_TYPE_MAP, REGIONS_BOUNDS
 
@@ -31,8 +31,8 @@ class TrafficCollector:
         self.sleep_time = 10
         self.prev_odometers = {}  # TODO: get prev odometers from database
 
-        self.traffic = database.traffic
-        self.traffic_congestion = database.traffic_congestion
+        self.traffic = DATABASE.traffic
+        self.traffic_congestion = DATABASE.traffic_congestion
 
     def run(self):
         """Define commands to repeat its per frequency."""

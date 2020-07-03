@@ -8,8 +8,9 @@ export default class NavigationBar extends React.PureComponent {
     render() {
         return (
             <div className="nav-bar">
-                <NavigationButton label="static" to="/static" />
+                <NavigationButton label="regions" to="/regions" />
                 <NavigationButton label="transport" to="/transport" />
+                <NavigationButton label="traffic" to="/traffic" />
             </div>
         )
     }

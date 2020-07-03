@@ -6,7 +6,7 @@ from pymongo.errors import PyMongoError
 
 from run import init_logging
 from settings import STATIC_DIR, STATIC_URL
-from app import database as db
+from app import DATABASE as db
 from app.utils import download_context, unzip
 from app.easyway import get_transport_counts, get_stops_per_routes
 

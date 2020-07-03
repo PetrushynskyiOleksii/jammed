@@ -2,7 +2,7 @@ import React from "react"
 
 import { AreaChart as AreaContainer, Area, YAxis } from "recharts"
 
-import { WHITE_COLOR, BLUE_COLOR, CHART_HEIGHT, CHART_WIDTH, CHART_ANIMATION } from "@utils/constants"
+import { BLUE_COLOR, CHART_HEIGHT, CHART_WIDTH, CHART_ANIMATION } from "@utils/constants"
 
 
 export default class AreaChart extends React.PureComponent {
@@ -18,7 +18,7 @@ export default class AreaChart extends React.PureComponent {
                 <defs>
                     <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="25%" stopColor={BLUE_COLOR} stopOpacity={1}/>
-                        <stop offset="100%" stopColor={WHITE_COLOR} stopOpacity={0.5}/>
+                        <stop offset="100%" stopColor={BLUE_COLOR} stopOpacity={0}/>
                     </linearGradient>
                 </defs>
                 <YAxis domain={[0, "dataMax + 5"]} hide={true}/>

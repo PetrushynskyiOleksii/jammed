@@ -7,10 +7,8 @@ import ScatterTime from "@components/tiles/scatterTime/scatterTime"
 
 import { SEARCH_ICON, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS, BLUE_THEME as theme } from "@utils/constants"
 
-import "./pages.sass"
 
-
-export default class TransportPage extends React.PureComponent {
+export default class TrafficPage extends React.PureComponent {
 
     state = {
         searchOpened: false,
@@ -35,7 +33,7 @@ export default class TransportPage extends React.PureComponent {
 
         const periodSeconds = parseInt(period) * HOUR_SECONDS
         return (
-            <div id="transport-page">
+            <div id="traffic-page">
                 <ChartsContainer>
                     <AreaNumber
                         theme={theme}

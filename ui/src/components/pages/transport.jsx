@@ -6,14 +6,12 @@ import DonutNumber from "@components/tiles/donutNumber/donutNumber"
 
 import { GREEN_THEME as theme } from "@utils/constants"
 
-import "./pages.sass"
 
-
-export default class StaticPage extends React.PureComponent {
+export default class TransportPage extends React.PureComponent {
 
     render() {
         return (
-            <div id="static-page">
+            <div id="transport-page">
                 <ChartsContainer>
                     <DonutNumber
                         theme={theme}
