@@ -20,16 +20,16 @@ class Congestion:
     def region_congestion(cls, region, limit):
         """Retrieve region congestion by region name."""
         try:
-            cursor = cls.collection.find(
+            result = list(cls.collection.find(
                 filter={"id": region},
                 limit=limit,
                 projection={'_id': 0}
-            )
-        except PyMongoError as err:
+            ))
+        except (PyMongoError, TypeError) as err:
             LOG.error("Couldn't retrieve region congestion (%s): %s", region, err)
             return None
 
-        return [x for x in cursor]
+        return result
 
 
 class Transport:

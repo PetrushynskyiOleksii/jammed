@@ -1,2 +1,0 @@
-@reboot /usr/local/bin/python /collector/static.py
-0 3 * * * /usr/local/bin/python /collector/static.py

@@ -97,7 +97,7 @@ def get_routes_static_info(info_id):
 def get_regions_congestion(region):
     """Return city region traffic congestion."""
     region = parse.unquote(region, encoding="utf-8")
-    limit = request.args.get("limit", type=float, default=15)
+    limit = request.args.get("limit", type=int, default=15)
     result = Congestion.region_congestion(region, limit)
     if result is None:
         message = "Couldn't retrieve data from database. Try again, please."

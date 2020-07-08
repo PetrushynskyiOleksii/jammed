@@ -1,2 +1,2 @@
 feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version
-ЛКП ,https://www.facebook.com/Lvivavtodor/,uk,20200625,20210308,2.090
+ЛКП ,https://www.facebook.com/Lvivavtodor/,uk,20200704,20210307,2.091

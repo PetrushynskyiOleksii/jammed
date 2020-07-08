@@ -2,6 +2,7 @@
 
 import csv
 import zipfile
+import json
 
 import requests
 
@@ -34,6 +35,17 @@ def load_csv(filepath, delimiter=','):
         output = [dict(row) for row in csv_data]
 
     return output
+
+
+def load_json(filepath):
+    """Return parsed json file as dictionary."""
+    with open(filepath) as json_file:
+        try:
+            json_data = json.load(json_file)
+        except json.JSONDecodeError:
+            return None
+
+    return json_data
 
 
 def unzip(zippath, dirpath):
