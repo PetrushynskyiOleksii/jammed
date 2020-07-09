@@ -4,6 +4,7 @@ from urllib import parse
 
 from flask import Blueprint, request
 
+from app import CACHE
 from app.utils import response
 from app.traffic.traffic import TrafficTimeseries, Congestion, Transport
 
@@ -82,6 +83,7 @@ def get_routes_names():
 
 
 @traffic_app.route("transport/<info_id>", methods=['GET'])
+@CACHE.cached(timeout=86400)  # 1 day in seconds
 def get_routes_static_info(info_id):
     """Return routes static information by id."""
     result = Transport.static_info(info_id)
