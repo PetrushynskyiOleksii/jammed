@@ -5,6 +5,8 @@ services:
   mongodb:
     container_name: jammed_mongodb
     image: mongo
+    env_file:
+      - .env
     volumes:
       - mongo-data:/data/db
     ports:

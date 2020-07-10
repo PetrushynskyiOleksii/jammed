@@ -11,7 +11,9 @@ from settings import (
     REDIS_HOST,
     REDIS_PASSWORD,
     MONGO_URI,
-    MONGO_SERVER_TIMEOUT
+    MONGO_SERVER_TIMEOUT,
+    MONGO_USERNAME,
+    MONGO_PASSWORD
 )
 
 
@@ -29,7 +31,12 @@ COLLECTOR_CELERY.conf.beat_schedule = {
 COLLECTOR_CELERY.conf.timezone = "Europe/Kiev"
 COLLECTOR_CELERY.conf.imports = ["app.tasks"]
 
-MONGO = MongoClient(MONGO_URI, serverSelectionTimeoutMS=MONGO_SERVER_TIMEOUT)
+MONGO = MongoClient(
+    MONGO_URI,
+    password=MONGO_PASSWORD,
+    username=MONGO_USERNAME,
+    serverSelectionTimeoutMS=MONGO_SERVER_TIMEOUT
+)
 DATABASE = MONGO.jammed
 
 REDIS = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)

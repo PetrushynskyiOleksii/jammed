@@ -20,6 +20,14 @@ Visualization of Lviv traffic information.
 ### Environment variables
 ```shell script
 LOG_DIR=
+
 MONGO_URI=
 MONGO_SERVER_TIMEOUT=
+MONGO_INITDB_ROOT_USERNAME=
+MONGO_INITDB_ROOT_PASSWORD=
+
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+REDIS_URI=
 ```
