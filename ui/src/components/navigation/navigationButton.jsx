@@ -1,14 +1,9 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 
-import { TRAFFIC_ICON, TRANSPORT_ICON, REGIONS_ICON } from "@utils/constants"
+import Icon from "@icons/icon"
+import { BIG_ICON_SIZE } from "@utils/constants"
 
-
-const ICONS = {
-    traffic: TRAFFIC_ICON,
-    transport: TRANSPORT_ICON,
-    regions: REGIONS_ICON
-}
 
 export default class NavigationButton extends React.PureComponent {
 
@@ -16,7 +11,7 @@ export default class NavigationButton extends React.PureComponent {
         const { label, to } = this.props
         return (
             <NavLink to={to} className="nav-item" activeClassName="nav-item-active">
-                {ICONS[label]}
+                <Icon name={`${label}-icon`} className="nav-icon" size={BIG_ICON_SIZE}/>
                 <div className="nav-label">{label}</div>
             </NavLink>
         )

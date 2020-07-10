@@ -1,22 +1,8 @@
 import React from "react"
 
-import LocationCityIcon from "@material-ui/icons/LocationCity"
-import TrafficIcon from "@material-ui/icons/Traffic"
-import DirectionsBusIcon from "@material-ui/icons/DirectionsBus"
-import SearchIcon from "@material-ui/icons/Search"
-import ErrorIcon from "@material-ui/icons/Error"
-import WarningIcon from "@material-ui/icons/Warning"
-import BlockIcon from "@material-ui/icons/Block"
-
 
 // ICONS
-export const ERROR_ICON = <ErrorIcon />
-export const WARNING_ICON = <WarningIcon />
-export const EMPTY_ICON = <BlockIcon />
-export const TRANSPORT_ICON = <DirectionsBusIcon />
-export const TRAFFIC_ICON = <TrafficIcon />
-export const SEARCH_ICON = <SearchIcon />
-export const REGIONS_ICON = <LocationCityIcon />
+export const BIG_ICON_SIZE = 54
 
 // COLORS
 export const YELLOW_COLOR = "#EBC673"

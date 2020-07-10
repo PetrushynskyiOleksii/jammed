@@ -76,6 +76,7 @@ target/
 .python-version
 
 # celery beat schedule file
+celerybeat.pid
 celerybeat-schedule
 
 # SageMath parsed files

@@ -5,7 +5,8 @@ import ChartsContainer from "@components/common/chartsContainer"
 import AreaNumber from "@components/tiles/areaNumber/areaNumber"
 import ScatterTime from "@components/tiles/scatterTime/scatterTime"
 
-import { SEARCH_ICON, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS, BLUE_THEME as theme } from "@utils/constants"
+import Icon from "@icons/icon"
+import { BIG_ICON_SIZE, ROUTE_KEY, PERIOD_KEY, HOUR_SECONDS, BLUE_THEME as theme } from "@utils/constants"
 
 
 export default class TrafficPage extends React.PureComponent {
@@ -65,7 +66,7 @@ export default class TrafficPage extends React.PureComponent {
                     />
                 </ChartsContainer>
                 <div className="search-button" onClick={this.openSearch}>
-                    { SEARCH_ICON }
+                    <Icon name="search-icon" className="search-icon" size={BIG_ICON_SIZE}/>
                 </div>
                 <SearchDialog
                     open={searchOpened}

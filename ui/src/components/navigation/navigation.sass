@@ -7,21 +7,20 @@
         flex-direction: column
         align-items: center
         margin: 10px 20px 25px 20px
-        svg
-            color: $dark-grey
-            font-size: 54px !important
+        .nav-icon
+            fill: $dark-grey
         .nav-label
             color: $dark-grey
             text-transform: uppercase
             text-align: center
             font-size: 18px
         &-active
-            .MuiSvgIcon-root, .nav-label
-                color: $white !important
+            .nav-icon
+                fill: $white
+            .nav-label
+                color: $white
         &:hover:not(.nav-item-active)
-            .MuiSvgIcon-root, .nav-label
-                color: $white !important
-        &:active
-            .MuiSvgIcon-root, .nav-label
-                color: $white !important
-                opacity: 0.5
+            .nav-icon
+                fill: $white
+            .nav-label
+                color: $white

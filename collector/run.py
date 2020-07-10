@@ -9,7 +9,7 @@ from app.tasks import prepare_static
 
 LOG = logging.getLogger("")
 LOG_FILEPATH = "jammed/collector.log"
-LOG_FORMAT = "testestetset%(asctime)s - %(levelname)s: %(name)s: %(message)s"
+LOG_FORMAT = "%(asctime)s - %(levelname)s: %(name)s: %(message)s"
 
 
 def init_logging():

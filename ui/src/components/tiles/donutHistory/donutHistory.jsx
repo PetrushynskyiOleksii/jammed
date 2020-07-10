@@ -57,7 +57,7 @@ export default class DonutHistory extends React.Component {
         if (error) return (
             <ChartCell className="donut-history">
                 <ChartHeader theme={theme} refresh={this.queryData} title={title} />
-                <ChartMessage theme={theme} text="Data could not be loaded" icon="error"/>
+                <ChartMessage theme={theme} text="Data could not be loaded" icon="error-icon"/>
             </ChartCell>
         )
         else if (loading) return (
@@ -69,7 +69,7 @@ export default class DonutHistory extends React.Component {
         else if (!data.length) return (
             <ChartCell className="donut-history">
                 <ChartHeader theme={theme} refresh={this.queryData} title={title} />
-                <ChartMessage theme={theme} text="No data points" icon="warning"/>
+                <ChartMessage theme={theme} text="No data points" icon="warning-icon"/>
             </ChartCell>
         )
 

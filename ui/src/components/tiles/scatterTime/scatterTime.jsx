@@ -62,13 +62,13 @@ export default class ScatterTime extends React.Component {
         if (!route) return (
             <ChartCell className="scatter-time">
                 <ChartHeader refresh={this.queryData} title={title} theme={theme}/>
-                <ChartMessage theme={theme} text="No route chosen" icon="empty"/>
+                <ChartMessage theme={theme} text="No route chosen" icon="empty-icon"/>
             </ChartCell>
         )
         else if (error) return (
             <ChartCell className="scatter-time">
                 <ChartHeader refresh={this.queryData} title={title} theme={theme}/>
-                <ChartMessage theme={theme} text="Data could not be loaded" icon="error"/>
+                <ChartMessage theme={theme} text="Data could not be loaded" icon="error-icon"/>
             </ChartCell>
         )
         else if (loading) return (
@@ -80,7 +80,7 @@ export default class ScatterTime extends React.Component {
         else if (!coordinates.length) return (
             <ChartCell className="scatter-time">
                 <ChartHeader refresh={this.queryData} title={title} theme={theme}/>
-                <ChartMessage theme={theme} text="No data points" icon="warning"/>
+                <ChartMessage theme={theme} text="No data points" icon="warning-icon"/>
             </ChartCell>
         )
 

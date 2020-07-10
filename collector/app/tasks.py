@@ -46,7 +46,7 @@ def collect_traffic(self):
         raise self.retry()
 
     traffic_congestion = parse_traffic_congestion(traffic)
-    try:  # TODO: use transaction
+    try:
         TRAFFIC_COLLECTION.insert_many(traffic)
         TRAFFIC_CONGESTION_COLLECTION.insert_many(traffic_congestion)
     except PyMongoError as err:
@@ -88,7 +88,7 @@ def insert_static():
     static_data.update({"stops_per_routes": get_stops_per_routes()})
 
     docs = [{"id": k, "data": v} for k, v in static_data.items()]
-    try:  # TODO: add transaction
+    try:
         DATABASE.transport.delete_many({})
         DATABASE.transport.insert_many(docs)
     except PyMongoError as err:

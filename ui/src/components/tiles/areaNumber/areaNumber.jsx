@@ -60,13 +60,13 @@ export default class AreaNumber extends React.Component {
         if (!route) return (
             <ChartCell className="area-number">
                 <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
-                <ChartMessage theme={theme} text="No route chosen" icon="empty"/>
+                <ChartMessage theme={theme} text="No route chosen" icon="empty-icon"/>
             </ChartCell>
         )
         else if (error) return (
             <ChartCell className="area-number">
                 <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
-                <ChartMessage theme={theme} text="Data could not be loaded" icon="error"/>
+                <ChartMessage theme={theme} text="Data could not be loaded" icon="error-icon"/>
             </ChartCell>
         )
         else if (loading) return (
@@ -78,7 +78,7 @@ export default class AreaNumber extends React.Component {
         else if (!timeseries.length) return (
             <ChartCell className="area-number">
                 <ChartHeader theme={theme} refresh={this.queryData} title={title}/>
-                <ChartMessage theme={theme} text="No data points" icon="warning"/>
+                <ChartMessage theme={theme} text="No data points" icon="warning-icon"/>
             </ChartCell>
         )
 
