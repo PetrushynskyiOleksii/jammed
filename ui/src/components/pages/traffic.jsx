@@ -17,8 +17,8 @@ export default class TrafficPage extends React.PureComponent {
         period: localStorage.getItem(PERIOD_KEY) || 1
     }
 
-    openSearch = () => {
-        this.setState({ searchOpened: true })
+    toggleSearch = () => {
+        this.setState({ searchOpened: !this.state.searchOpened })
     }
 
     submit = (route, period) => {
@@ -65,11 +65,12 @@ export default class TrafficPage extends React.PureComponent {
                         title="coordinates"
                     />
                 </ChartsContainer>
-                <div className="search-button" onClick={this.openSearch}>
+                <div className="search-button" onClick={this.toggleSearch}>
                     <Icon name="search-icon" className="search-icon" size={BIG_ICON_SIZE}/>
                 </div>
                 <SearchDialog
                     open={searchOpened}
+                    close={this.toggleSearch}
                     submit={this.submit}
                 />
             </div>
