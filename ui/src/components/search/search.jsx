@@ -1,9 +1,11 @@
 import React from "react"
 
-import Slider from "@material-ui/core/Slider"
 import Dialog from "@material-ui/core/Dialog"
 import DialogContent from "@material-ui/core/DialogContent"
 
+import SearchPeriod from "@components/search/searchPeriod"
+import SearchTransport from "@components/search/searchTransport"
+import SearchError from "@components/search/searchError"
 import { TIMESERIES_PATH, ROUTE_KEY, PERIOD_KEY } from "@utils/constants"
 import request from "@utils/request"
 import "./search.sass"
@@ -14,19 +16,19 @@ export default class SearchDialog extends React.Component {
     state = {
         loading: false,
         error: false,
-        route: localStorage.getItem(ROUTE_KEY),
-        period: localStorage.getItem(PERIOD_KEY),
+        currentRoute: localStorage.getItem(ROUTE_KEY),
+        period: localStorage.getItem(PERIOD_KEY) || 1,
         data: []
     }
 
-    setRouteName = (route) => {
+    setRouteName = (currentRoute) => {
         const { period } = this.state
 
-        this.setState({ route })
-        localStorage.setItem(ROUTE_KEY, route)
+        this.setState({ currentRoute })
+        localStorage.setItem(ROUTE_KEY, currentRoute)
         localStorage.setItem(PERIOD_KEY, period)
 
-        this.props.submit(route, period)
+        this.props.submit(currentRoute, period)
     };
 
     setPeriod = (event, period) => {
@@ -56,49 +58,24 @@ export default class SearchDialog extends React.Component {
     }
 
     render() {
-        const { open } = this.props
-        const { data, route, period } = this.state
-        return (
-            <Dialog open={open}>
+        const { open, close } = this.props
+        const { data, currentRoute, period } = this.state
+        if (!data.length) return (
+            <Dialog open={open} onClose={close}>
                 <DialogContent className="search-dialog">
-                    <div className="search-period">
-                        <div className="search-period-title">
-                            Period:
-                            <span className="search-period-value">
-                                {period}h
-                            </span>
-                        </div>
-                        <div className="search-period-slider">
-                            <Slider
-                                value={parseInt(period)}
-                                onChange={this.setPeriod}
-                                aria-labelledby="discrete-slider"
-                                valueLabelDisplay="off"
-                                min={1}
-                                max={24}
-                            />
-                        </div>
-                    </div>
-                    {data.map(item =>
-                        <div key={item.route_type} className="search-transport-wrapper">
-                            <div className="search-transport-title">
-                                {item.route_type}
-                            </div>
-                            <div className="search-transport-container">
-                                {item.route_names.map(name =>
-                                    <div key={name}
-                                        className={route !== name ?
-                                            "search-transport":
-                                            "search-transport search-transport-active"
-                                        }
-                                        data-name={name}
-                                        onClick={() => {this.setRouteName(name)}}>
-                                        {name}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                    <SearchError />
+                </DialogContent>
+            </Dialog>
+        )
+        return (
+            <Dialog open={open} onClose={close}>
+                <DialogContent className="search-dialog">
+                    <SearchPeriod period={period} setPeriod={this.setPeriod}/>
+                    <SearchTransport
+                        transports={data}
+                        currentRoute={currentRoute}
+                        setRouteName={this.setRouteName}
+                    />
                 </DialogContent>
             </Dialog>
         )
