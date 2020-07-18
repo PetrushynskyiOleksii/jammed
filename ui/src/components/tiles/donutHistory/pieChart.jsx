@@ -2,8 +2,14 @@ import React from "react"
 
 import { PieChart as PieContainer, Pie, Cell } from "recharts"
 
-import { RED_COLOR, YELLOW_COLOR, CHART_HEIGHT, CHART_WIDTH, BLACK_LIGHT_COLOR, CHART_ANIMATION } from "@utils/constants"
-
+import {
+    RED_YELLOW_GRADIENT,
+    YELLOW_COLOR,
+    CHART_HEIGHT,
+    CHART_WIDTH,
+    BLACK_LIGHT_COLOR,
+    CHART_ANIMATION
+} from "@utils/constants"
 
 const CHART_PIE_INNER_RADIUS = 75
 const CHART_PIE_OUTER_RADIUS = 110
@@ -23,12 +29,20 @@ export default class PieChart extends React.PureComponent {
 
     render() {
         const { data } = this.props
+        const colorIndex = Math.ceil(data.value / 10) - 1
 
         return (
             <PieContainer
                 width={CHART_WIDTH}
                 height={CHART_PIE_HEIGHT}
             >
+                <defs>
+                    <radialGradient id="pie-radial-gradient">
+                        <stop offset="25%" stopColor={YELLOW_COLOR}/>
+                        <stop offset="100%" stopColor={RED_YELLOW_GRADIENT[colorIndex]}/>
+                    </radialGradient>
+                </defs>
+
                 <Pie
                     data={this.formatPie(data)}
                     dataKey="value"
@@ -40,8 +54,8 @@ export default class PieChart extends React.PureComponent {
                     animationBegin={0}
                     animationDuration={CHART_ANIMATION}
                 >
-                    <Cell key={`cell-${1}`} fill={YELLOW_COLOR} opacity={0.1}/>
-                    <Cell key={`cell-${2}`} fill={YELLOW_COLOR}/>
+                    <Cell key={`cell-${1}`} fill="url(#pie-radial-gradient)" opacity={0.1}/>
+                    <Cell key={`cell-${2}`} fill="url(#pie-radial-gradient)"/>
                 </Pie>
             </PieContainer>
         )
