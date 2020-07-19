@@ -14,9 +14,8 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # TODO: figure out about bcrypt
-    app.register_blueprint(traffic_app, url_prefix="/api/v1/")
-    app_settings = os.getenv("APP_MODE", "app.config.DevelopmentConfig")
+    app.register_blueprint(traffic_app, url_prefix="/api/v1")
+    app_settings = os.environ.get("SERVER_MODE", "app.config.DevelopmentConfig")
     app.config.from_object(app_settings)
 
     CACHE.init_app(app)

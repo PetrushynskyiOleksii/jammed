@@ -20,6 +20,7 @@ Visualization of Lviv traffic information.
 ### Environment variables
 ```shell script
 LOG_DIR=
+SERVER_MODE=
 
 MONGO_URI=
 MONGO_SERVER_TIMEOUT=
