@@ -63,7 +63,7 @@ services:
     build: ./server
     env_file:
       - .env
-    command: python run.py
+    command: gunicorn --workers=4 -b :5000 "run:create_app()" --access-logfile "/proc/1/fd/1" --error-logfile "/proc/1/fd/2"
     stdin_open: true
     tty: true
     volumes:
