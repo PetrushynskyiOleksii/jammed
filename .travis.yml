@@ -22,6 +22,17 @@ matrix:
         - yarn install
       script:
         - yarn lint
+        - yarn build
+      deploy:
+        on:
+          branch: develop
+        provider: s3
+        region: $AWS_REGION
+        access_key_id: $AWS_ACCESS_KEY_ID
+        secret_access_key: $AWS_SECRET_ACCESS_KEY
+        bucket: $AWS_BUCKET_NAME
+        local_dir: ./dist
+        skip_cleanup: true
 
 branches:
   only:
