@@ -19,13 +19,12 @@ matrix:
       before_install:
         - cd ui
       install:
+        - yarn add travis-ci-cloudfront-invalidation
         - yarn install
       script:
         - yarn lint
         - yarn build
       deploy:
-        on:
-          branch: develop
         provider: s3
         region: $AWS_REGION
         access_key_id: $AWS_ACCESS_KEY_ID
@@ -33,6 +32,10 @@ matrix:
         bucket: $AWS_BUCKET_NAME
         local_dir: ./dist
         skip_cleanup: true
+        on:
+          branch: develop
+      after_deploy:
+        - travis-ci-cloudfront-invalidation -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY -c $CLOUDFRONT_DISTRIBUTION_ID -i '/*' -b $TRAVIS_BRANCH -p $TRAVIS_PULL_REQUEST -o 'develop'
 
 branches:
   only:
